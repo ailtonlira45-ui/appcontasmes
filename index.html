@@ -1,1410 +1,736 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>CONTROLE DE VIAGEM</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Agenda do Allan</title>
     <style>
         :root {
-            --bg-dark: #1a1a1a;
-            --bg-card: rgba(255, 255, 255, 0.06);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --border-color: rgba(255, 255, 255, 0.12);
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --radius-sm: 12px;
+            --bg: #0d0d15;
+            --surface: #161622;
+            --surface2: #1e1e2e;
+            --surface3: #282840;
+            --text: #eeeef5;
+            --text2: #9999aa;
+            --text3: #555568;
+            --accent: #7c6ff7;
+            --accent2: #a99bfa;
+            --green: #00c896;
+            --red: #f07070;
+            --blue: #5b9cf5;
+            --orange: #f5b84d;
+            --pink: #f070a0;
+            --border: rgba(255,255,255,0.06);
+            --border2: rgba(255,255,255,0.1);
+            --radius: 18px;
+            --radius-sm: 14px;
+            --safe-bottom: env(safe-area-inset-bottom, 16px);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        input, select, textarea {
-            -webkit-user-select: text;
-            user-select: text;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; width: 100%; overflow-x: hidden; }
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             display: flex;
-            align-items: flex-start;
             justify-content: center;
-            padding: 16px;
-            position: relative;
-            overflow-x: hidden;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            -webkit-overflow-scrolling: touch;
         }
 
-        .animated-bg {
-            position: fixed;
+        .app {
+            width: 100%;
+            max-width: 440px;
+            padding: 0 14px;
+            padding-bottom: calc(90px + var(--safe-bottom));
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 20px 4px 14px;
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .gradient-layer {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.04) 0%, transparent 45%),
-                linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            will-change: auto;
-        }
-
-        .container {
-            position: relative;
             z-index: 10;
-            width: 100%;
-            max-width: 680px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            padding-bottom: 20px;
+            background: var(--bg);
+        }
+        .header-row { display: flex; align-items: center; justify-content: space-between; }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c6ff7, #a99bfa);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; border: 2px solid rgba(255,255,255,0.1);
+        }
+        .header-title { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+        .header-subtitle { font-size: 11px; color: var(--text2); font-weight: 500; }
+        .clock {
+            display: flex; align-items: center; gap: 3px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 25px; padding: 8px 14px;
+        }
+        .clock-time {
+            font-size: 18px; font-weight: 700;
+            font-family: 'SF Mono', 'Courier New', monospace; color: var(--accent2);
+        }
+        .clock-sec {
+            font-size: 10px; color: var(--text3);
+            font-family: 'SF Mono', 'Courier New', monospace;
         }
 
-        /* Indicador de salvamento */
-        .save-indicator {
-            position: fixed;
-            top: 12px;
-            right: 16px;
-            background: rgba(16, 185, 129, 0.25);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            color: #10b981;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.25s ease;
-            pointer-events: none;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        .calendar {
+            background: var(--surface); border-radius: var(--radius);
+            padding: 16px; margin: 6px 0 14px; border: 1px solid var(--border);
         }
-
-        .save-indicator.show {
-            opacity: 1;
-            transform: translateY(0);
+        .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .calendar-month { font-weight: 800; font-size: 17px; color: #fff; }
+        .calendar-nav {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--surface2); border: 1px solid var(--border2);
+            color: #fff; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 15px; font-weight: 700;
         }
-
-        /* Logo */
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 6px 0;
+        .calendar-nav:active { background: var(--accent); transform: scale(0.9); }
+        .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 6px; }
+        .calendar-weekday { text-align: center; font-size: 11px; color: #b0b0c0; font-weight: 700; padding: 5px 0; }
+        .calendar-dates { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+        .calendar-date {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.15s; position: relative; color: #e0e0e8;
         }
-
-        .logo-cv {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 12px 24px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        .calendar-date:active { transform: scale(0.88); }
+        .calendar-date.other { color: #4a4a5a; opacity: 0.5; }
+        .calendar-date.today {
+            background: var(--accent); color: #fff; font-weight: 800; font-size: 15px;
+            box-shadow: 0 4px 16px rgba(124,111,247,0.3);
         }
-
-        .logo-text {
-            font-size: 1.6rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: #ffffff;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        .calendar-date.selected {
+            outline: 3px solid var(--accent2); outline-offset: -2px;
+            background: rgba(124,111,247,0.2); font-weight: 700;
+        }
+        .calendar-date.today.selected { outline-color: #fff; background: var(--accent); }
+        .calendar-date.has-task::after {
+            content: '📌';
+            position: absolute;
+            bottom: 1px;
+            right: 2px;
+            font-size: 9px;
             line-height: 1;
-            text-transform: uppercase;
+        }
+        .calendar-date.today.has-task::after {
+            content: '📍';
+            font-size: 10px;
         }
 
-        .logo-subtitle {
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.7);
-            text-transform: uppercase;
+        .filter-info {
+            background: var(--surface); border-radius: var(--radius-sm);
+            padding: 12px 14px; margin-bottom: 14px; text-align: center;
+            border: 1px solid var(--accent); display: none;
+        }
+        .filter-info.show { display: block; }
+        .filter-info .date-label { font-size: 10px; font-weight: 700; color: var(--text2); text-transform: uppercase; }
+        .filter-info .date-value { font-size: 18px; font-weight: 800; color: #fff; }
+        .filter-info .clear-btn {
+            display: inline-block; margin-top: 6px; padding: 5px 12px;
+            border-radius: 15px; font-size: 10px; font-weight: 600; cursor: pointer;
+            border: 1px solid var(--border2); background: var(--surface2);
+            color: var(--text2); font-family: inherit;
         }
 
-        .logo-divider {
-            width: 1px;
-            height: 30px;
-            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.3), transparent);
+        .progress-card {
+            display: flex; align-items: center; gap: 14px; padding: 16px;
+            background: var(--surface); border-radius: var(--radius);
+            margin-bottom: 14px; border: 1px solid var(--border);
         }
-
-        .logo-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .progress-ring { position: relative; width: 55px; height: 55px; flex-shrink: 0; }
+        .progress-ring svg { transform: rotate(-90deg); }
+        .progress-ring-bg { fill: none; stroke: var(--surface3); stroke-width: 5; }
+        .progress-ring-fill {
+            fill: none; stroke: var(--accent2); stroke-width: 5;
+            stroke-linecap: round; transition: stroke-dashoffset 0.5s ease;
         }
-
-        /* Glass Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-lg);
-            padding: 18px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        .progress-ring-text {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%,-50%); font-size: 15px; font-weight: 800; color: #fff;
         }
+        .progress-info-title { font-weight: 700; font-size: 14px; }
+        .progress-info-sub { font-size: 11px; color: var(--text2); }
 
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            flex-wrap: wrap;
-            gap: 8px;
+        .section-title {
+            font-size: 11px; font-weight: 700; color: #b0b0c0;
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-left: 4px;
         }
-
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .task-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+        .task {
+            display: flex; align-items: center; gap: 10px; padding: 14px 15px;
+            background: var(--surface); border-radius: var(--radius-sm);
+            cursor: pointer; transition: all 0.15s; border: 1px solid var(--border);
+            position: relative; overflow: hidden;
         }
-
-        h2 {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #ffffff;
-            margin: 0;
+        .task:active { background: var(--surface2); }
+        .task.done { opacity: 0.5; }
+        .task.done .task-name { text-decoration: line-through; color: var(--text3); }
+        .task.today-task { border-color: rgba(245,200,66,0.35); }
+        .task.today-task::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 3px; background: #f5c842; border-radius: 0 3px 3px 0;
         }
-
-        h2 i {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
+        .task-check {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2.5px solid var(--border2); display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0; font-size: 11px; font-weight: 700;
+            background: var(--surface2);
         }
-
-        .badge {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            padding: 4px 10px;
-            border-radius: 16px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+        .task.done .task-check {
+            background: var(--green); border-color: var(--green); color: #000;
         }
-
-        .badge i {
-            font-size: 0.4rem;
-            color: #10b981;
+        .task-body { flex: 1; min-width: 0; }
+        .task-name { font-weight: 600; font-size: 14px; }
+        .task-meta { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 10px; color: var(--text2); }
+        .task-meta .date-highlight { color: var(--accent2); font-weight: 600; }
+        .task-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .dot-trabalho { background: var(--blue); }
+        .dot-estudo { background: #f07070; }
+        .dot-exercício { background: var(--green); }
+        .dot-pessoal { background: var(--pink); }
+        .task-actions { display: flex; gap: 3px; flex-shrink: 0; }
+        .task-btn {
+            width: 30px; height: 30px; border-radius: 50%; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; background: var(--surface2); color: var(--text2);
         }
+        .task-btn.del:active { background: rgba(240,112,112,0.15); color: var(--red); }
 
-        /* Form Elements */
-        .input-group {
-            margin-bottom: 14px;
-            position: relative;
+        .empty { text-align: center; padding: 40px 20px; color: var(--text3); }
+        .empty-icon { font-size: 48px; margin-bottom: 8px; opacity: 0.3; }
+        .empty-text { font-size: 13px; }
+
+        .fab {
+            position: fixed; bottom: calc(24px + var(--safe-bottom)); left: 50%;
+            transform: translateX(-50%); width: 54px; height: 54px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c6ff7, #a99bfa); border: none;
+            color: #fff; font-size: 26px; cursor: pointer; z-index: 20;
+            box-shadow: 0 8px 30px rgba(124,111,247,0.4);
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(255,255,255,0.1);
         }
+        .fab:active { transform: translateX(-50%) scale(0.9); }
 
-        .input-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .input-row .input-group {
-            flex: 1;
-        }
-
-        label {
-            display: block;
-            font-size: 0.62rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: rgba(255, 255, 255, 0.65);
-            margin-bottom: 6px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-sm);
-            color: #ffffff;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            transition: border-color 0.2s ease, background 0.2s ease;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            padding-right: 32px;
-        }
-
-        select option {
-            background: #2d2d2d;
-            color: #ffffff;
-        }
-
-        input:focus, select:focus {
-            border-color: rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        input[readonly] {
-            background: rgba(255, 255, 255, 0.03);
-            font-weight: 600;
-            border-color: rgba(255, 255, 255, 0.12);
-            font-size: 0.9rem;
-            letter-spacing: 0.3px;
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        .novo-veiculo-group {
-            display: none;
-            margin-top: 10px;
-            padding: 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--radius-md);
-        }
-
-        .novo-veiculo-group.show {
-            display: block;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: background 0.2s ease, transform 0.15s ease;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-            letter-spacing: 0.2px;
-            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn-primary {
-            width: 100%;
-            background: linear-gradient(135deg, #ffffff, #cccccc);
-            color: #1a1a1a;
-            font-size: 0.9rem;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-            padding: 13px;
-        }
-
-        .btn-primary:active {
-            background: linear-gradient(135deg, #e0e0e0, #bbbbbb);
-        }
-
-        .btn-novo-veiculo {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 10px 12px;
-            font-size: 0.75rem;
-        }
-
-        .btn-novo-veiculo:active {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-salvar-veiculo {
-            background: linear-gradient(135deg, #ffffff, #cccccc);
-            color: #1a1a1a;
-            width: 100%;
-            margin-top: 8px;
-            font-weight: 700;
-            font-size: 0.82rem;
-            padding: 12px;
-        }
-
-        .btn-salvar-veiculo:active {
-            background: linear-gradient(135deg, #e0e0e0, #bbbbbb);
-        }
-
-        .btn-gerenciar-veiculos {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 10px 12px;
-            font-size: 0.75rem;
-        }
-
-        .btn-gerenciar-veiculos:active {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-history {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            padding: 8px 14px;
-            font-size: 0.75rem;
-        }
-
-        .btn-history:active {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-history.active {
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 255, 255, 0.35);
-        }
-
-        .btn-mercadopago {
-            background: linear-gradient(135deg, #00B2FF, #009EE2);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            font-size: 0.82rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-radius: var(--radius-sm);
-            box-shadow: 0 8px 20px rgba(0, 178, 255, 0.2);
-            width: 100%;
-            justify-content: center;
-            letter-spacing: 0.2px;
-        }
-
-        .btn-mercadopago:active {
-            background: linear-gradient(135deg, #009EE2, #0088CC);
-            transform: scale(0.98);
-        }
-
-        .veiculo-select-row {
-            display: flex;
-            gap: 8px;
-            align-items: flex-end;
-        }
-
-        .veiculo-select-row .input-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        /* History Panel */
-        .history-panel {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s ease, opacity 0.3s ease;
-            opacity: 0;
-        }
-
-        .history-panel.show {
-            max-height: 2000px;
-            opacity: 1;
-            margin-top: 16px;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: var(--radius-md);
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.72rem;
-            text-align: left;
-            min-width: 500px;
-        }
-
-        th {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 600;
-            padding: 10px 8px;
-            font-size: 0.58rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
-        }
-
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 400;
-            white-space: nowrap;
-        }
-
-        tr.viagem-row:active td {
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .km-badge {
-            background: rgba(255, 255, 255, 0.06);
-            color: #ffffff;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.7rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .hours-badge {
-            background: rgba(255, 255, 255, 0.06);
-            color: #ffffff;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.7rem;
-        }
-
-        .city-badge {
-            background: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.7rem;
-            max-width: 80px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: inline-block;
-        }
-
-        .vehicle-badge {
-            background: rgba(255, 255, 255, 0.06);
-            color: #ffffff;
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.7rem;
-            max-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: inline-block;
-        }
-
-        .delete-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.7);
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .delete-btn:active {
-            background: #ff4444;
-            color: white;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 24px;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.8rem;
-        }
-
-        .route-arrow {
-            color: rgba(255, 255, 255, 0.4);
-            margin: 0 2px;
-            font-size: 0.5rem;
-        }
-
-        .total-info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: var(--radius-md);
-            font-size: 0.75rem;
-            font-weight: 500;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .footer-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-
-        /* Modal */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            -webkit-backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 30; display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s;
         }
-
-        .modal-content {
-            background: rgba(40, 40, 40, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            max-width: 480px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            -webkit-overflow-scrolling: touch;
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal {
+            background: var(--surface); border-radius: 22px 22px 0 0;
+            padding: 22px 18px calc(22px + var(--safe-bottom));
+            width: 100%; max-width: 440px; transform: translateY(100%);
+            transition: transform 0.3s ease; border: 1px solid var(--border);
+            border-bottom: none; max-height: 85vh; overflow-y: auto;
         }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            background: rgba(40, 40, 40, 0.95);
-            z-index: 1;
+        .modal-overlay.open .modal { transform: translateY(0); }
+        .modal-handle {
+            width: 32px; height: 3px; background: var(--surface3);
+            border-radius: 2px; margin: 0 auto 18px;
         }
-
-        .modal-header h3 {
-            font-size: 1rem;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 18px; text-align: center; }
+        .form-group { margin-bottom: 14px; }
+        .form-label {
+            display: block; font-size: 10px; font-weight: 700; color: #b0b0c0;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;
         }
-
-        .close-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            color: #ffffff;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+        .form-input {
+            width: 100%; padding: 12px 14px; background: var(--surface2);
+            border: 2px solid var(--border); border-radius: 10px; color: #fff;
+            font-size: 15px; font-family: inherit; outline: none;
         }
+        .form-input:focus { border-color: var(--accent); }
+        .form-input::placeholder { color: var(--text3); }
 
-        .close-btn:active {
-            background: rgba(255, 0, 0, 0.3);
+        .mini-cal { background: var(--surface2); border-radius: 12px; padding: 12px; border: 1px solid var(--border); }
+        .mini-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .mini-cal-month { font-weight: 700; font-size: 14px; color: #fff; }
+        .mini-cal-nav {
+            width: 28px; height: 28px; border-radius: 50%; background: var(--surface3);
+            border: 1px solid var(--border2); color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
         }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
+        .mini-cal-nav:active { background: var(--accent); transform: scale(0.9); }
+        .mini-cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; margin-bottom: 4px; }
+        .mini-cal-day { text-align: center; font-size: 10px; color: #b0b0c0; font-weight: 700; padding: 4px 0; }
+        .mini-cal-dates { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .mini-cal-date {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer;
+            transition: all 0.1s; color: #e0e0e8;
         }
-
-        .detail-item {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: var(--radius-md);
-            padding: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+        .mini-cal-date:active { transform: scale(0.85); }
+        .mini-cal-date.other { color: #4a4a5a; opacity: 0.4; }
+        .mini-cal-date.today { background: var(--accent); color: #fff; font-weight: 800; }
+        .mini-cal-date.sel {
+            background: rgba(124,111,247,0.25); outline: 2.5px solid var(--accent2);
+            outline-offset: -2px; font-weight: 700;
         }
-
-        .detail-item.full-width {
-            grid-column: 1 / -1;
+        .mini-cal-date.today.sel { outline-color: #fff; background: var(--accent); }
+        .mini-cal-selected {
+            text-align: center; margin-top: 10px; font-size: 11px; color: var(--accent2);
+            padding: 6px; background: rgba(124,111,247,0.05); border-radius: 8px;
+            min-height: 30px; display: flex; align-items: center; justify-content: center;
+            flex-wrap: wrap; gap: 4px; font-weight: 600;
         }
-
-        .detail-label {
-            font-size: 0.55rem;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: rgba(255, 255, 255, 0.55);
-            margin-bottom: 4px;
-            font-weight: 700;
+        .mini-cal-tag {
+            background: rgba(124,111,247,0.15); color: #fff; padding: 4px 9px;
+            border-radius: 12px; font-size: 10px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 4px;
         }
+        .mini-cal-tag .remove { cursor: pointer; font-size: 12px; opacity: 0.6; }
+        .mini-cal-tag .remove:active { opacity: 1; }
 
-        .detail-value {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #ffffff;
+        .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+        .chip {
+            padding: 9px 14px; border-radius: 18px; font-size: 12px; font-weight: 600;
+            cursor: pointer; border: 2px solid transparent; background: var(--surface2);
+            color: var(--text2);
         }
+        .chip.active { border-color: var(--accent); color: #fff; background: rgba(124,111,247,0.1); }
+        .chip.work { color: var(--blue); }
+        .chip.work.active { border-color: var(--blue); }
+        .chip.study { color: #f07070; }
+        .chip.study.active { border-color: #f07070; }
+        .chip.exercise { color: var(--green); }
+        .chip.exercise.active { border-color: var(--green); }
+        .chip.personal { color: var(--pink); }
+        .chip.personal.active { border-color: var(--pink); }
 
-        .detail-value.large {
-            font-size: 1.1rem;
+        .modal-btns { display: flex; gap: 8px; margin-top: 20px; }
+        .btn {
+            flex: 1; padding: 13px; border-radius: 12px; font-size: 14px;
+            font-weight: 600; cursor: pointer; border: none; font-family: inherit;
         }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
 
-        .detail-value.vehicle-highlight {
-            font-size: 1rem;
+        .clear-btn {
+            display: block; margin: 0 auto 18px; padding: 10px 20px;
+            border-radius: 22px; font-size: 11px; font-weight: 600; cursor: pointer;
+            border: 1px solid var(--border2); background: var(--surface);
+            color: var(--text2); font-family: inherit;
         }
+        .clear-btn:active { background: rgba(240,112,112,0.1); color: var(--red); }
 
-        .route-detail {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #ffffff;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: var(--radius-md);
-            padding: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            flex-wrap: wrap;
+        .toast {
+            position: fixed; top: 16px; left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: #1e1e2e; color: #fff; padding: 10px 20px;
+            border-radius: 25px; font-size: 12px; font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 50;
+            transition: transform 0.35s ease; border: 1px solid rgba(255,255,255,0.1);
         }
-
-        .veiculo-list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            margin-bottom: 6px;
-        }
-
-        .veiculo-list-item .nome {
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .veiculo-list-item .km {
-            font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.55);
-        }
-
-        .btn-delete-veiculo {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            padding: 7px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.72rem;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-delete-veiculo:active {
-            background: #ff4444;
-            color: white;
-        }
-
-        .btn-modal-close {
-            background: linear-gradient(135deg, #ffffff, #cccccc);
-            color: #1a1a1a;
-            width: 100%;
-            font-weight: 700;
-            padding: 12px;
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-        }
-
-        .btn-modal-close:active {
-            background: linear-gradient(135deg, #e0e0e0, #bbbbbb);
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-                align-items: flex-start;
-            }
-
-            .container {
-                gap: 14px;
-            }
-
-            .input-row {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            .glass-card {
-                padding: 14px;
-            }
-
-            .detail-grid {
-                grid-template-columns: 1fr;
-            }
-
-            th, td {
-                padding: 8px 5px;
-                font-size: 0.65rem;
-            }
-
-            .veiculo-select-row {
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-
-            .veiculo-select-row .input-group {
-                min-width: 100%;
-                order: 1;
-            }
-
-            .btn-novo-veiculo {
-                order: 2;
-                flex: 1;
-                font-size: 0.7rem;
-                padding: 9px 10px;
-            }
-
-            .btn-gerenciar-veiculos {
-                order: 3;
-                flex: 1;
-                font-size: 0.7rem;
-                padding: 9px 10px;
-            }
-
-            .logo-text {
-                font-size: 1.3rem;
-                letter-spacing: 1px;
-            }
-
-            .logo-cv {
-                padding: 10px 16px;
-                gap: 8px;
-            }
-
-            .logo-divider {
-                height: 22px;
-            }
-
-            .logo-subtitle {
-                font-size: 0.55rem;
-            }
-
-            .btn {
-                font-size: 0.72rem;
-                padding: 9px 12px;
-            }
-
-            input, select {
-                padding: 9px 10px;
-                font-size: 0.8rem;
-            }
-
-            label {
-                font-size: 0.58rem;
-            }
-
-            h2 {
-                font-size: 1rem;
-            }
-
-            .modal-content {
-                padding: 14px;
-                max-height: 90vh;
-            }
-        }
-
-        @media (max-width: 360px) {
-            body {
-                padding: 6px;
-            }
-
-            .glass-card {
-                padding: 10px;
-                border-radius: 18px;
-            }
-
-            input, select {
-                font-size: 0.75rem;
-                padding: 8px;
-                border-radius: 8px;
-            }
-
-            .btn-primary {
-                font-size: 0.8rem;
-                padding: 11px;
-            }
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
-    <div class="animated-bg">
-        <div class="gradient-layer"></div>
+    <div class="app">
+        <div class="header">
+            <div class="header-row">
+                <div class="header-left">
+                    <div class="header-avatar">📋</div>
+                    <div>
+                        <div class="header-title">Agenda do Allan</div>
+                        <div class="header-subtitle" id="headerDate"></div>
+                    </div>
+                </div>
+                <div class="clock">
+                    <span class="clock-time" id="clockTime">00:00</span>
+                    <span class="clock-sec" id="clockSec">00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="calendar">
+            <div class="calendar-header">
+                <button class="calendar-nav" id="calPrev">◀</button>
+                <div class="calendar-month" id="calMonth"></div>
+                <button class="calendar-nav" id="calNext">▶</button>
+            </div>
+            <div class="calendar-weekdays" id="calWeekdays"></div>
+            <div class="calendar-dates" id="calDates"></div>
+        </div>
+
+        <div class="filter-info" id="filterInfo">
+            <div class="date-label">📅 Data selecionada</div>
+            <div class="date-value" id="filterDateValue"></div>
+            <button class="clear-btn" id="clearFilterBtn">✕ Mostrar todas</button>
+        </div>
+
+        <div class="progress-card">
+            <div class="progress-ring">
+                <svg width="55" height="55" viewBox="0 0 55 55">
+                    <circle class="progress-ring-bg" cx="27.5" cy="27.5" r="23"/>
+                    <circle class="progress-ring-fill" id="progressFill" cx="27.5" cy="27.5" r="23"/>
+                </svg>
+                <div class="progress-ring-text" id="progressPct">0%</div>
+            </div>
+            <div>
+                <div class="progress-info-title" id="progressTitle">Selecione uma data</div>
+                <div class="progress-info-sub" id="progressSub">Toque em um dia no calendário</div>
+            </div>
+        </div>
+
+        <div class="section-title">📌 Atividades</div>
+        <div class="task-list" id="taskList"></div>
+        <button class="clear-btn" id="clearDone">🧹 Limpar concluídas</button>
     </div>
 
-    <span class="save-indicator" id="saveIndicator">
-        <i class="fas fa-check-circle"></i> Salvo
-    </span>
+    <button class="fab" id="fab">+</button>
 
-    <div class="container">
-        <!-- Logo CONTROLE DE VIAGEM -->
-        <div class="logo-container">
-            <div class="logo-cv">
-                <span class="logo-text">CONTROLE</span>
-                <div class="logo-divider"></div>
-                <div class="logo-info">
-                    <span class="logo-subtitle">DE VIAGEM</span>
-                </div>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalSheet">
+            <div class="modal-handle"></div>
+            <div class="modal-title" id="modalTitle">Nova Atividade</div>
+            <div id="editBadge" style="display:none;text-align:center;margin-bottom:12px;font-size:10px;color:var(--accent2);font-weight:600;background:rgba(124,111,247,0.1);padding:5px 12px;border-radius:18px;">✏️ Editando</div>
+            <div class="form-group">
+                <label class="form-label">📝 O que vai fazer?</label>
+                <input type="text" class="form-input" id="inputName" placeholder="Ex: Academia, reunião..." autocomplete="off">
             </div>
-        </div>
-
-        <!-- Card de Registro -->
-        <div class="glass-card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-truck-fast"></i>
-                    <h2>Nova Viagem</h2>
-                </div>
-                <span class="badge" id="contadorViagens">
-                    <i class="fas fa-circle"></i> 0 viagens
-                </span>
-            </div>
-
-            <!-- Veículo -->
-            <div class="input-group">
-                <label><i class="fas fa-truck"></i> Veículo</label>
-                <div class="veiculo-select-row">
-                    <div class="input-group">
-                        <select id="veiculo" onchange="onVeiculoChange()">
-                            <option value="">Selecione um veículo...</option>
-                        </select>
+            <div class="form-group">
+                <label class="form-label">📅 Selecione os dias</label>
+                <div class="mini-cal">
+                    <div class="mini-cal-header">
+                        <button class="mini-cal-nav" id="miniCalPrev">◀</button>
+                        <div class="mini-cal-month" id="miniCalMonth"></div>
+                        <button class="mini-cal-nav" id="miniCalNext">▶</button>
                     </div>
-                    <button type="button" class="btn btn-novo-veiculo" onclick="toggleNovoVeiculo()">
-                        <i class="fas fa-plus-circle"></i> Novo
-                    </button>
-                    <button type="button" class="btn btn-gerenciar-veiculos" onclick="abrirGerenciarVeiculos()">
-                        <i class="fas fa-cog"></i> Gerenc.
-                    </button>
+                    <div class="mini-cal-days" id="miniCalDays"></div>
+                    <div class="mini-cal-dates" id="miniCalDates"></div>
+                    <div class="mini-cal-selected" id="miniCalSelected">📅 Nenhum dia selecionado</div>
                 </div>
             </div>
-
-            <!-- Novo Veículo -->
-            <div class="novo-veiculo-group" id="novoVeiculoPanel">
-                <label><i class="fas fa-truck-loading"></i> Novo Veículo</label>
-                <div class="input-row">
-                    <div class="input-group">
-                        <input type="text" id="novoVeiculoNome" placeholder="Nome do veículo...">
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="novoVeiculoKm" placeholder="KM Inicial">
-                    </div>
-                </div>
-                <button type="button" class="btn btn-salvar-veiculo" onclick="cadastrarVeiculo()">
-                    <i class="fas fa-save"></i> Cadastrar
-                </button>
-            </div>
-
-            <!-- Cidades -->
-            <div class="input-row">
-                <div class="input-group">
-                    <label><i class="fas fa-map-marker-alt"></i> Origem</label>
-                    <input type="text" id="cidadeSaida" placeholder="Cidade de origem" oninput="salvarRascunho()">
-                </div>
-                <div class="input-group">
-                    <label><i class="fas fa-flag-checkered"></i> Destino</label>
-                    <input type="text" id="cidadeChegada" placeholder="Cidade de destino" oninput="salvarRascunho()">
+            <div class="form-group">
+                <label class="form-label">📂 Categoria</label>
+                <div class="chips" id="chips">
+                    <div class="chip work" data-cat="trabalho">💼 Trabalho</div>
+                    <div class="chip study" data-cat="estudo">📚 Estudo</div>
+                    <div class="chip exercise" data-cat="exercício">🏃 Exercício</div>
+                    <div class="chip personal" data-cat="pessoal">👤 Pessoal</div>
                 </div>
             </div>
-
-            <!-- Datas -->
-            <div class="input-row">
-                <div class="input-group">
-                    <label><i class="far fa-calendar-alt"></i> Início</label>
-                    <input type="datetime-local" id="inicio" onchange="calcularHoras(); salvarRascunho()">
-                </div>
-                <div class="input-group">
-                    <label><i class="far fa-calendar-check"></i> Fim</label>
-                    <input type="datetime-local" id="fim" onchange="calcularHoras(); salvarRascunho()">
-                </div>
+            <div class="modal-btns">
+                <button class="btn btn-secondary" id="btnCancel">Cancelar</button>
+                <button class="btn btn-primary" id="btnSave">💾 Salvar</button>
             </div>
-
-            <!-- KM -->
-            <div class="input-row">
-                <div class="input-group">
-                    <label><i class="fas fa-play"></i> KM Inicial</label>
-                    <input type="number" id="kmInicial" placeholder="0" oninput="calcularKM(); salvarRascunho()">
-                </div>
-                <div class="input-group">
-                    <label><i class="fas fa-stop"></i> KM Final</label>
-                    <input type="number" id="kmFinal" placeholder="0" oninput="calcularKM(); salvarRascunho()">
-                </div>
-            </div>
-
-            <!-- Totais -->
-            <div class="input-row">
-                <div class="input-group">
-                    <label><i class="fas fa-road"></i> Total KM</label>
-                    <input type="text" id="totalKM" placeholder="Automático" readonly>
-                </div>
-                <div class="input-group">
-                    <label><i class="far fa-clock"></i> Total Horas</label>
-                    <input type="text" id="totalHoras" placeholder="Automático" readonly>
-                </div>
-            </div>
-
-            <button class="btn btn-primary" onclick="salvar()" style="margin-top: 8px;">
-                <i class="fas fa-save"></i> Registrar
-            </button>
-        </div>
-
-        <!-- Histórico -->
-        <div class="glass-card">
-            <div class="card-header">
-                <div class="card-title">
-                    <i class="fas fa-clock-rotate-left"></i>
-                    <h2>Histórico</h2>
-                </div>
-                <button class="btn btn-history" id="btnHistorico" onclick="toggleHistorico()">
-                    <i class="fas fa-chevron-down" id="iconeHistorico"></i>
-                    <span id="textoHistorico">Abrir</span>
-                </button>
-            </div>
-
-            <div class="history-panel" id="historyPanel">
-                <div class="total-info" id="totalInfo" style="display: none;">
-                    <span><i class="fas fa-route"></i> <strong id="totalKmGeral">0 km</strong></span>
-                    <span><i class="far fa-clock"></i> <strong id="totalHorasGeral">0h</strong></span>
-                </div>
-                <div class="table-wrapper">
-                    <table id="tabela">
-                        <thead>
-                            <tr>
-                                <th>Veículo</th>
-                                <th>Rota</th>
-                                <th>Data</th>
-                                <th>KM</th>
-                                <th>Horas</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer-links">
-            <a href="https://mpago.la/2amJvAu" target="_blank" class="btn-mercadopago">
-                <i class="fas fa-hand-holding-usd"></i> Apoie Nosso Projeto via Mercado Pago
-                <i class="fas fa-donate"></i>
-            </a>
         </div>
     </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
-        let viagens = JSON.parse(localStorage.getItem("viagens")) || [];
-        let veiculos = JSON.parse(localStorage.getItem("veiculos")) || [];
-        let rascunho = JSON.parse(localStorage.getItem("rascunhoViagem")) || {};
-        let historicoAberto = false;
+        const KEY = 'agenda_allan_v3';
+        let tasks = [], dateFilter = null, editId = null, category = 'trabalho';
+        let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+        let miniYear = new Date().getFullYear(), miniMonth = new Date().getMonth(), miniDates = [];
 
-        function formatarData(isoString) {
-            if (!isoString) return "—";
-            const data = new Date(isoString);
-            return data.toLocaleString('pt-BR', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            }).replace(',', '');
+        function today() {
+            const d = new Date();
+            return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
         }
+        function uid() { return 't'+Date.now()+Math.random().toString(36).substr(2,6); }
 
-        function formatarDataCurta(isoString) {
-            if (!isoString) return "—";
-            const data = new Date(isoString);
-            return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-        }
-
-        function formatarHoras(horasDecimais) {
-            if (isNaN(horasDecimais) || horasDecimais === null || horasDecimais < 0) return "—";
-            const horas = Math.floor(horasDecimais);
-            const minutos = Math.round((horasDecimais - horas) * 60);
-            if (horas === 0 && minutos === 0) return "0min";
-            if (horas === 0) return `${minutos}min`;
-            if (minutos === 0) return `${horas}h`;
-            return `${horas}h ${minutos}min`;
-        }
-
-        function salvarRascunho() {
-            rascunho = {
-                veiculo: document.getElementById("veiculo").value,
-                cidadeSaida: document.getElementById("cidadeSaida").value,
-                cidadeChegada: document.getElementById("cidadeChegada").value,
-                inicio: document.getElementById("inicio").value,
-                fim: document.getElementById("fim").value,
-                kmInicial: document.getElementById("kmInicial").value,
-                kmFinal: document.getElementById("kmFinal").value
-            };
-            localStorage.setItem("rascunhoViagem", JSON.stringify(rascunho));
-            
-            const indicator = document.getElementById("saveIndicator");
-            indicator.classList.add("show");
-            clearTimeout(indicator._timeout);
-            indicator._timeout = setTimeout(() => {
-                indicator.classList.remove("show");
-            }, 1200);
-        }
-
-        function carregarRascunho() {
-            if (rascunho.veiculo) document.getElementById("veiculo").value = rascunho.veiculo;
-            if (rascunho.cidadeSaida) document.getElementById("cidadeSaida").value = rascunho.cidadeSaida;
-            if (rascunho.cidadeChegada) document.getElementById("cidadeChegada").value = rascunho.cidadeChegada;
-            if (rascunho.inicio) document.getElementById("inicio").value = rascunho.inicio;
-            if (rascunho.fim) document.getElementById("fim").value = rascunho.fim;
-            if (rascunho.kmInicial) document.getElementById("kmInicial").value = rascunho.kmInicial;
-            if (rascunho.kmFinal) document.getElementById("kmFinal").value = rascunho.kmFinal;
-            if (rascunho.kmInicial || rascunho.kmFinal) calcularKM();
-            if (rascunho.inicio || rascunho.fim) calcularHoras();
-        }
-
-        function limparRascunho() {
-            localStorage.removeItem("rascunhoViagem");
-            rascunho = {};
-        }
-
-        function carregarVeiculos() {
-            const select = document.getElementById("veiculo");
-            select.innerHTML = '<option value="">Selecione um veículo...</option>';
-            veiculos.forEach(v => {
-                const option = document.createElement("option");
-                option.value = v.nome;
-                option.textContent = `${v.nome} (${v.kmAtual || 0}km)`;
-                option.dataset.km = v.kmAtual || 0;
-                select.appendChild(option);
-            });
-            if (rascunho.veiculo && veiculos.find(v => v.nome === rascunho.veiculo)) {
-                select.value = rascunho.veiculo;
+        function load() {
+            try { const s = localStorage.getItem(KEY); if (s) tasks = JSON.parse(s); if (!Array.isArray(tasks)) tasks = []; } catch(e) { tasks = []; }
+            if (!tasks.length) {
+                const t = today();
+                tasks = [
+                    { id: uid(), name: 'Reunião de planejamento', dates: [t], category: 'trabalho', done: false, created: Date.now() },
+                    { id: uid(), name: 'Estudar TypeScript', dates: [t], category: 'estudo', done: false, created: Date.now() },
+                    { id: uid(), name: 'Corrida matinal', dates: [t], category: 'exercício', done: true, created: Date.now() },
+                    { id: uid(), name: 'Ler 30 minutos', dates: [t], category: 'pessoal', done: false, created: Date.now() },
+                ];
+                save();
             }
+            tasks.forEach(t => { if (t.date && !t.dates) { t.dates = [t.date]; delete t.date; } if (!t.dates) t.dates = [today()]; });
+        }
+        function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
+
+        function fmtDate(ds) {
+            if (!ds) return '';
+            const [y,m,d] = ds.split('-').map(Number), dt = new Date(y,m-1,d);
+            const td = today(), tmr = new Date(); tmr.setDate(tmr.getDate()+1);
+            const yst = new Date(); yst.setDate(yst.getDate()-1);
+            if (ds === td) return 'Hoje';
+            if (ds === tmr.toISOString().split('T')[0]) return 'Amanhã';
+            if (ds === yst.toISOString().split('T')[0]) return 'Ontem';
+            return dt.toLocaleDateString('pt-BR', { day:'numeric', month:'short' });
+        }
+        function fmtDates(arr) { return arr && arr.length ? arr.map(d => fmtDate(d)).join(', ') : ''; }
+        function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        function filtered() {
+            if (!dateFilter) return [];
+            return tasks.filter(t => t.dates && t.dates.includes(dateFilter)).sort((a,b) => b.created - a.created);
         }
 
-        function onVeiculoChange() {
-            const selectedOption = document.getElementById("veiculo").selectedOptions[0];
-            if (selectedOption?.dataset.km) {
-                document.getElementById("kmInicial").value = selectedOption.dataset.km;
-                calcularKM();
-                salvarRascunho();
-            }
-        }
-
-        function toggleNovoVeiculo() {
-            const panel = document.getElementById("novoVeiculoPanel");
-            panel.classList.toggle("show");
-            if (panel.classList.contains("show")) {
-                document.getElementById("novoVeiculoNome").focus();
-            }
-        }
-
-        function cadastrarVeiculo() {
-            const nome = document.getElementById("novoVeiculoNome").value.trim();
-            const km = parseFloat(document.getElementById("novoVeiculoKm").value);
-            if (!nome) return alert("⚠️ Digite o nome do veículo.");
-            if (isNaN(km) || km < 0) return alert("⚠️ Digite um KM inicial válido.");
-            if (veiculos.find(v => v.nome.toLowerCase() === nome.toLowerCase())) {
-                return alert("⚠️ Este veículo já está cadastrado!");
-            }
-            veiculos.push({ nome, kmAtual: km });
-            localStorage.setItem("veiculos", JSON.stringify(veiculos));
-            carregarVeiculos();
-            document.getElementById("veiculo").value = nome;
-            onVeiculoChange();
-            document.getElementById("novoVeiculoPanel").classList.remove("show");
-            document.getElementById("novoVeiculoNome").value = "";
-            document.getElementById("novoVeiculoKm").value = "";
-            salvarRascunho();
-            alert(`✅ Veículo "${nome}" cadastrado!`);
-        }
-
-        function abrirGerenciarVeiculos() {
-            document.getElementById("modalOverlay")?.remove();
-            const overlay = document.createElement("div");
-            overlay.className = "modal-overlay";
-            overlay.id = "modalOverlay";
-            let html = veiculos.length === 0 
-                ? '<div class="empty-message">Nenhum veículo cadastrado</div>'
-                : veiculos.map(v => `
-                    <div class="veiculo-list-item">
-                        <div>
-                            <div class="nome"><i class="fas fa-truck"></i> ${v.nome}</div>
-                            <div class="km">KM: ${v.kmAtual || 0}</div>
+        function renderTasks() {
+            const list = document.getElementById('taskList'), f = filtered(), td = today();
+            const fi = document.getElementById('filterInfo');
+            if (!dateFilter) {
+                fi.classList.remove('show');
+                list.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">Toque em um dia no calendário</div></div>';
+            } else if (!f.length) {
+                fi.classList.add('show');
+                document.getElementById('filterDateValue').textContent = fmtDate(dateFilter);
+                list.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Nenhuma atividade para ${fmtDate(dateFilter).toLowerCase()}</div></div>`;
+            } else {
+                fi.classList.add('show');
+                document.getElementById('filterDateValue').textContent = fmtDate(dateFilter);
+                list.innerHTML = f.map(t => {
+                    const id = t.id, datesStr = fmtDates(t.dates), isToday = t.dates && t.dates.includes(td) && !t.done;
+                    return `<div class="task ${t.done?'done':''} ${isToday?'today-task':''}" data-id="${id}">
+                        <div class="task-check" data-act="toggle" data-id="${id}">${t.done?'✓':''}</div>
+                        <div class="task-body" data-act="edit" data-id="${id}">
+                            <div class="task-name">${esc(t.name)}</div>
+                            <div class="task-meta">
+                                ${datesStr?`<span class="date-highlight">📅 ${datesStr}</span>`:''}
+                                <span class="task-dot dot-${t.category}"></span> ${t.category.charAt(0).toUpperCase()+t.category.slice(1)}
+                                ${t.dates&&t.dates.length>1?`<span style="color:var(--accent2);font-weight:600;">+${t.dates.length-1}</span>`:''}
+                            </div>
                         </div>
-                        <button class="btn-delete-veiculo" onclick="deletarVeiculo('${v.nome}')">
-                            <i class="fas fa-trash-alt"></i> Remover
-                        </button>
-                    </div>
-                `).join('');
-            overlay.innerHTML = `
-                <div class="modal-content" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-cog"></i> Veículos</h3>
-                        <button class="close-btn" onclick="fecharModal()"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div style="margin-bottom: 16px;">${html}</div>
-                    <button class="btn-modal-close" onclick="fecharModal()">Fechar</button>
-                </div>`;
-            overlay.addEventListener("click", fecharModal);
-            document.body.appendChild(overlay);
-        }
-
-        function deletarVeiculo(nomeVeiculo) {
-            if (confirm(`Remover "${nomeVeiculo}"?\n\n⚠️ Viagens registradas serão mantidas.`)) {
-                veiculos = veiculos.filter(v => v.nome !== nomeVeiculo);
-                localStorage.setItem("veiculos", JSON.stringify(veiculos));
-                carregarVeiculos();
-                abrirGerenciarVeiculos();
+                        <div class="task-actions">
+                            <button class="task-btn" data-act="edit" data-id="${id}">✏️</button>
+                            <button class="task-btn del" data-act="delete" data-id="${id}">🗑️</button>
+                        </div>
+                    </div>`;
+                }).join('');
             }
+            updateStats();
         }
 
-        function atualizarKmVeiculo(nomeVeiculo, kmFinal) {
-            const index = veiculos.findIndex(v => v.nome === nomeVeiculo);
-            if (index !== -1) {
-                veiculos[index].kmAtual = parseFloat(kmFinal);
-                localStorage.setItem("veiculos", JSON.stringify(veiculos));
-                carregarVeiculos();
-            }
-        }
-
-        function calcularKM() {
-            const inicial = parseFloat(document.getElementById("kmInicial").value);
-            const final = parseFloat(document.getElementById("kmFinal").value);
-            const total = document.getElementById("totalKM");
-            if (!isNaN(inicial) && !isNaN(final) && final >= inicial) {
-                total.value = final - inicial;
-            } else if (!isNaN(inicial) && !isNaN(final)) {
-                total.value = "KM inválido";
+        function updateStats() {
+            const f = filtered(), total = f.length, done = f.filter(t => t.done).length;
+            const pct = total ? Math.round((done/total)*100) : 0;
+            document.getElementById('progressPct').textContent = pct+'%';
+            const circ = 2*Math.PI*23, fill = document.getElementById('progressFill');
+            fill.style.strokeDasharray = circ;
+            fill.style.strokeDashoffset = circ - (pct/100)*circ;
+            if (!dateFilter) {
+                document.getElementById('progressTitle').textContent = 'Selecione uma data';
+                document.getElementById('progressSub').textContent = 'Toque em um dia no calendário';
+            } else if (!total) {
+                document.getElementById('progressTitle').textContent = 'Nenhuma tarefa';
+                document.getElementById('progressSub').textContent = 'Neste dia';
+            } else if (done === total) {
+                document.getElementById('progressTitle').textContent = 'Tudo concluído! 🎉';
+                document.getElementById('progressSub').textContent = `${done}/${total} atividades feitas`;
             } else {
-                total.value = "";
+                document.getElementById('progressTitle').textContent = `${done} de ${total} concluídas`;
+                document.getElementById('progressSub').textContent = `${total-done} pendentes`;
             }
         }
 
-        function calcularHoras() {
-            const inicio = document.getElementById("inicio").value;
-            const fim = document.getElementById("fim").value;
-            const total = document.getElementById("totalHoras");
-            if (inicio && fim) {
-                const diff = (new Date(fim) - new Date(inicio)) / 36e5;
-                total.value = diff >= 0 ? diff.toFixed(1) : "Inválido";
+        function renderCalendar() {
+            const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            document.getElementById('calMonth').textContent = months[calMonth]+' '+calYear;
+            document.getElementById('calWeekdays').innerHTML = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="calendar-weekday">${d}</div>`).join('');
+            const firstDay = new Date(calYear,calMonth,1).getDay(), daysIn = new Date(calYear,calMonth+1,0).getDate();
+            const daysPrev = new Date(calYear,calMonth,0).getDate(), td = today();
+            const taskDates = new Set(); tasks.forEach(t => { if (t.dates) t.dates.forEach(d => taskDates.add(d)); });
+            let h = '';
+            for (let i = firstDay-1; i >= 0; i--) {
+                const day = daysPrev-i, m = calMonth===0?11:calMonth-1, y = calMonth===0?calYear-1:calYear;
+                h += `<div class="calendar-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
+            }
+            for (let day = 1; day <= daysIn; day++) {
+                const ds = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+                let cls = 'calendar-date';
+                if (ds === td) cls += ' today';
+                if (ds === dateFilter) cls += ' selected';
+                if (taskDates.has(ds)) cls += ' has-task';
+                h += `<div class="${cls}" data-date="${ds}">${day}</div>`;
+            }
+            const total = firstDay+daysIn, rem = total<=35?35-total:42-total;
+            for (let day = 1; day <= rem; day++) {
+                const m = calMonth===11?0:calMonth+1, y = calMonth===11?calYear+1:calYear;
+                h += `<div class="calendar-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
+            }
+            document.getElementById('calDates').innerHTML = h;
+        }
+
+        function calMove(d) { calMonth += d; if (calMonth>11) { calMonth=0; calYear++; } else if (calMonth<0) { calMonth=11; calYear--; } renderCalendar(); }
+        function calSelect(ds) { dateFilter = ds; renderTasks(); renderCalendar(); }
+        function clearFilter() { dateFilter = null; renderTasks(); renderCalendar(); }
+
+        function renderMiniCal() {
+            const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            document.getElementById('miniCalMonth').textContent = months[miniMonth]+' '+miniYear;
+            document.getElementById('miniCalDays').innerHTML = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="mini-cal-day">${d}</div>`).join('');
+            const firstDay = new Date(miniYear,miniMonth,1).getDay(), daysIn = new Date(miniYear,miniMonth+1,0).getDate();
+            const daysPrev = new Date(miniYear,miniMonth,0).getDate(), td = today();
+            let h = '';
+            for (let i = firstDay-1; i >= 0; i--) {
+                const day = daysPrev-i, m = miniMonth===0?11:miniMonth-1, y = miniMonth===0?miniYear-1:miniYear;
+                h += `<div class="mini-cal-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
+            }
+            for (let day = 1; day <= daysIn; day++) {
+                const ds = miniYear+'-'+String(miniMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+                let cls = 'mini-cal-date';
+                if (ds === td) cls += ' today';
+                if (miniDates.includes(ds)) cls += ' sel';
+                h += `<div class="${cls}" data-date="${ds}">${day}</div>`;
+            }
+            const total = firstDay+daysIn, rem = total<=35?35-total:42-total;
+            for (let day = 1; day <= rem; day++) {
+                const m = miniMonth===11?0:miniMonth+1, y = miniMonth===11?miniYear+1:miniYear;
+                h += `<div class="mini-cal-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
+            }
+            document.getElementById('miniCalDates').innerHTML = h;
+            updateMiniSel();
+        }
+
+        function updateMiniSel() {
+            const el = document.getElementById('miniCalSelected');
+            if (!miniDates.length) el.innerHTML = '📅 Nenhum dia selecionado';
+            else if (miniDates.length <= 5) el.innerHTML = miniDates.map(d => `<span class="mini-cal-tag">${fmtDate(d)} <span class="remove" data-date="${d}">✕</span></span>`).join('');
+            else el.innerHTML = `<span class="mini-cal-tag">${miniDates.length} dias selecionados</span>`;
+        }
+
+        function miniToggle(ds) {
+            const idx = miniDates.indexOf(ds);
+            if (idx > -1) miniDates.splice(idx, 1);
+            else miniDates.push(ds);
+            miniDates.sort(); renderMiniCal();
+        }
+        function miniRemove(ds) { miniDates = miniDates.filter(d => d !== ds); renderMiniCal(); }
+        function miniMove(d) { miniMonth += d; if (miniMonth>11) { miniMonth=0; miniYear++; } else if (miniMonth<0) { miniMonth=11; miniYear--; } renderMiniCal(); }
+
+        function toggleTask(id) {
+            const t = tasks.find(x => x.id === id);
+            if (t) { t.done = !t.done; save(); renderTasks(); renderCalendar(); toast(t.done?'✅ Concluída!':'🔄 Reaberta'); }
+        }
+        function deleteTask(id) {
+            const len = tasks.length; tasks = tasks.filter(x => x.id !== id);
+            if (tasks.length < len) { if (editId === id) closeModal(); save(); renderTasks(); renderCalendar(); toast('🗑️ Removida'); }
+        }
+        function clearDone() {
+            if (!dateFilter) { toast('ℹ️ Selecione uma data primeiro'); return; }
+            const ids = filtered().filter(t => t.done).map(t => t.id);
+            if (!ids.length) { toast('ℹ️ Nada para limpar'); return; }
+            tasks = tasks.filter(t => !ids.includes(t.id));
+            save(); renderTasks(); renderCalendar(); toast(`🧹 ${ids.length} removida(s)`);
+        }
+
+        function openModal(id) {
+            const input = document.getElementById('inputName');
+            if (id) {
+                const t = tasks.find(x => x.id === id); if (!t) return;
+                editId = id;
+                document.getElementById('modalTitle').textContent = 'Editar Atividade';
+                document.getElementById('editBadge').style.display = 'block';
+                document.getElementById('btnSave').textContent = '💾 Atualizar';
+                input.value = t.name; miniDates = [...(t.dates||[today()])]; category = t.category;
+                if (miniDates.length) { const [y,m] = miniDates[0].split('-'); miniYear = +y; miniMonth = +m-1; }
             } else {
-                total.value = "";
+                editId = null;
+                document.getElementById('modalTitle').textContent = 'Nova Atividade';
+                document.getElementById('editBadge').style.display = 'none';
+                document.getElementById('btnSave').textContent = '💾 Salvar';
+                input.value = ''; miniDates = dateFilter?[dateFilter]:[today()]; category = 'trabalho';
+                const [y,m] = miniDates[0].split('-'); miniYear = +y; miniMonth = +m-1;
             }
+            updateChips(); renderMiniCal();
+            document.getElementById('modalOverlay').classList.add('open');
+            setTimeout(() => input.focus(), 400);
         }
-
-        function toggleHistorico() {
-            const panel = document.getElementById("historyPanel");
-            const btn = document.getElementById("btnHistorico");
-            historicoAberto = !historicoAberto;
-            if (historicoAberto) {
-                panel.classList.add("show");
-                document.getElementById("iconeHistorico").className = "fas fa-chevron-up";
-                document.getElementById("textoHistorico").textContent = "Fechar";
-                btn.classList.add("active");
-            } else {
-                panel.classList.remove("show");
-                document.getElementById("iconeHistorico").className = "fas fa-chevron-down";
-                document.getElementById("textoHistorico").textContent = "Abrir";
-                btn.classList.remove("active");
-            }
-        }
-
-        function atualizarContador() {
-            document.getElementById("contadorViagens").innerHTML = 
-                `<i class="fas fa-circle"></i> ${viagens.length} viagens`;
-        }
-
-        function atualizarTotais() {
-            const totalKm = viagens.reduce((acc, v) => acc + (parseFloat(v.km) || 0), 0);
-            const totalHoras = viagens.reduce((acc, v) => acc + (parseFloat(v.horas) || 0), 0);
-            const infoDiv = document.getElementById("totalInfo");
-            if (viagens.length > 0) {
-                infoDiv.style.display = "flex";
-                document.getElementById("totalKmGeral").textContent = `${totalKm} km`;
-                document.getElementById("totalHorasGeral").textContent = formatarHoras(totalHoras);
-            } else {
-                infoDiv.style.display = "none";
-            }
-        }
-
-        function carregar() {
-            const tbody = document.querySelector("#tabela tbody");
-            tbody.innerHTML = viagens.length === 0 
-                ? '<tr><td colspan="6" class="empty-message">Nenhuma viagem registrada</td></tr>'
-                : viagens.map((v, i) => `
-                    <tr class="viagem-row" onclick="abrirDetalhes(${i})">
-                        <td><span class="vehicle-badge" title="${v.veiculo || '—'}">${v.veiculo || '—'}</span></td>
-                        <td>
-                            <span class="city-badge">${v.cidadeSaida || '—'}</span>
-                            <i class="fas fa-arrow-right route-arrow"></i>
-                            <span class="city-badge">${v.cidadeChegada || '—'}</span>
-                        </td>
-                        <td>${formatarDataCurta(v.inicio)}</td>
-                        <td><span class="km-badge">${v.km || 0} km</span></td>
-                        <td><span class="hours-badge">${formatarHoras(parseFloat(v.horas) || 0)}</span></td>
-                        <td>
-                            <button class="delete-btn" onclick="event.stopPropagation(); excluir(${i})">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            atualizarContador();
-            atualizarTotais();
-        }
-
-        function excluir(i) {
-            if (confirm("Excluir esta viagem?\nO KM do veículo NÃO será alterado.")) {
-                viagens.splice(i, 1);
-                localStorage.setItem("viagens", JSON.stringify(viagens));
-                carregar();
-            }
-        }
-
-        function abrirDetalhes(index) {
-            const v = viagens[index];
-            if (!v) return;
-            document.getElementById("modalOverlay")?.remove();
-            const overlay = document.createElement("div");
-            overlay.className = "modal-overlay";
-            overlay.id = "modalOverlay";
-            overlay.innerHTML = `
-                <div class="modal-content" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-route"></i> Detalhes</h3>
-                        <button class="close-btn" onclick="fecharModal()"><i class="fas fa-times"></i></button>
-                    </div>
-                    <div class="detail-item full-width" style="margin-bottom: 10px;">
-                        <div class="detail-label">Veículo</div>
-                        <div class="detail-value vehicle-highlight">${v.veiculo || '—'}</div>
-                    </div>
-                    <div class="route-detail" style="margin-bottom: 16px;">
-                        <i class="fas fa-map-marker-alt"></i> ${v.cidadeSaida || '—'}
-                        <i class="fas fa-arrow-right"></i>
-                        <i class="fas fa-map-pin"></i> ${v.cidadeChegada || '—'}
-                    </div>
-                    <div class="detail-grid">
-                        <div class="detail-item"><div class="detail-label">Início</div><div class="detail-value">${formatarData(v.inicio)}</div></div>
-                        <div class="detail-item"><div class="detail-label">Fim</div><div class="detail-value">${formatarData(v.fim)}</div></div>
-                        <div class="detail-item"><div class="detail-label">KM Inicial</div><div class="detail-value">${v.kmInicial || 0}</div></div>
-                        <div class="detail-item"><div class="detail-label">KM Final</div><div class="detail-value">${v.kmFinal || 0}</div></div>
-                        <div class="detail-item"><div class="detail-label">Quilometragem</div><div class="detail-value large">${v.km || 0} km</div></div>
-                        <div class="detail-item"><div class="detail-label">Duração</div><div class="detail-value large">${formatarHoras(parseFloat(v.horas) || 0)}</div></div>
-                    </div>
-                    <button class="btn-modal-close" onclick="fecharModal()">Fechar</button>
-                </div>`;
-            overlay.addEventListener("click", fecharModal);
-            document.body.appendChild(overlay);
-        }
-
-        function fecharModal() {
-            const overlay = document.getElementById("modalOverlay");
-            if (overlay) overlay.remove();
-        }
-
-        function salvar() {
-            const veiculo = document.getElementById("veiculo").value;
-            const cidadeSaida = document.getElementById("cidadeSaida").value.trim();
-            const cidadeChegada = document.getElementById("cidadeChegada").value.trim();
-            const inicio = document.getElementById("inicio").value;
-            const fim = document.getElementById("fim").value;
-            const kmInicial = parseFloat(document.getElementById("kmInicial").value);
-            const kmFinal = parseFloat(document.getElementById("kmFinal").value);
-            const km = document.getElementById("totalKM").value;
-            const horas = document.getElementById("totalHoras").value;
-
-            if (!veiculo) return alert("⚠️ Selecione um veículo.");
-            if (!cidadeSaida || !cidadeChegada) return alert("⚠️ Preencha origem e destino.");
-            if (!inicio || !fim) return alert("⚠️ Preencha as datas.");
-            if (isNaN(kmInicial) || isNaN(kmFinal)) return alert("⚠️ Preencha os KM.");
-            if (!km || km === "KM inválido" || parseFloat(km) < 0) return alert("⚠️ KM inválido.");
-            if (!horas || horas === "Inválido" || parseFloat(horas) < 0) return alert("⚠️ Datas inválidas.");
-
-            viagens.push({ veiculo, cidadeSaida, cidadeChegada, inicio, fim, kmInicial, kmFinal, km: parseFloat(km), horas: parseFloat(horas) });
-            localStorage.setItem("viagens", JSON.stringify(viagens));
-            atualizarKmVeiculo(veiculo, kmFinal);
-            carregar();
-            limpar();
-            limparRascunho();
-            if (!historicoAberto) toggleHistorico();
-            alert(`✅ Viagem registrada!\n🚛 ${veiculo}\n📍 KM Final: ${kmFinal}`);
-        }
-
-        function limpar() {
-            ["veiculo", "cidadeSaida", "cidadeChegada", "inicio", "fim", "kmInicial", "kmFinal"].forEach(id => {
-                document.getElementById(id).value = "";
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editId = null; miniDates = []; }
+        function setCategory(cat) { category = cat; updateChips(); }
+        function updateChips() {
+            document.querySelectorAll('.chip').forEach(c => {
+                c.classList.remove('active');
+                if (c.dataset.cat === category) c.classList.add('active');
             });
-            document.getElementById("totalKM").value = "";
-            document.getElementById("totalHoras").value = "";
+        }
+        function saveTask() {
+            const input = document.getElementById('inputName'), name = input.value.trim();
+            if (!name) { toast('⚠️ Digite o nome'); input.focus(); return; }
+            if (!miniDates.length) { toast('⚠️ Selecione pelo menos um dia'); return; }
+            if (editId) {
+                const t = tasks.find(x => x.id === editId);
+                if (t) { t.name = name; t.dates = [...miniDates]; t.category = category; }
+                toast('✅ Atualizada!');
+            } else {
+                tasks.push({ id: uid(), name, dates: [...miniDates], category, done: false, created: Date.now() });
+                toast('✅ Adicionada!');
+            }
+            save();
+            if (dateFilter && !miniDates.includes(dateFilter)) { dateFilter = miniDates[0]; const [y,m] = miniDates[0].split('-'); calYear = +y; calMonth = +m-1; }
+            renderTasks(); renderCalendar(); closeModal();
         }
 
-        document.addEventListener("keydown", e => { if (e.key === "Escape") fecharModal(); });
+        let toastTimer;
+        function toast(msg) {
+            const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+            clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+        }
 
-        carregarVeiculos();
-        carregarRascunho();
-        carregar();
+        function updateClock() {
+            const n = new Date();
+            document.getElementById('clockTime').textContent = String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+            document.getElementById('clockSec').textContent = String(n.getSeconds()).padStart(2,'0');
+        }
+        function updateHeader() {
+            document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+        }
+
+        function bind() {
+            document.getElementById('taskList').addEventListener('click', function(e) {
+                const btn = e.target.closest('[data-act]'); if (!btn) return;
+                e.stopPropagation();
+                const act = btn.dataset.act, id = btn.dataset.id;
+                if (act === 'toggle') toggleTask(id);
+                else if (act === 'edit') openModal(id);
+                else if (act === 'delete') deleteTask(id);
+            });
+            document.getElementById('calDates').addEventListener('click', function(e) {
+                const d = e.target.closest('.calendar-date'); if (!d) return; calSelect(d.dataset.date);
+            });
+            document.getElementById('calPrev').addEventListener('click', function(e) { e.preventDefault(); calMove(-1); });
+            document.getElementById('calNext').addEventListener('click', function(e) { e.preventDefault(); calMove(1); });
+            document.getElementById('clearFilterBtn').addEventListener('click', function(e) { e.preventDefault(); clearFilter(); });
+
+            document.getElementById('miniCalDates').addEventListener('click', function(e) {
+                const d = e.target.closest('.mini-cal-date'); if (!d) return; e.stopPropagation(); miniToggle(d.dataset.date);
+            });
+            document.getElementById('miniCalSelected').addEventListener('click', function(e) {
+                const r = e.target.closest('.remove'); if (!r) return; e.stopPropagation(); miniRemove(r.dataset.date);
+            });
+            document.getElementById('miniCalPrev').addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); miniMove(-1); });
+            document.getElementById('miniCalNext').addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); miniMove(1); });
+
+            document.getElementById('chips').addEventListener('click', function(e) {
+                const c = e.target.closest('.chip'); if (!c) return; setCategory(c.dataset.cat);
+            });
+            document.getElementById('fab').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('modalOverlay').classList.contains('open') ? closeModal() : openModal();
+            });
+            document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+            document.getElementById('modalSheet').addEventListener('click', function(e) { e.stopPropagation(); });
+            document.getElementById('btnCancel').addEventListener('click', function(e) { e.preventDefault(); closeModal(); });
+            document.getElementById('btnSave').addEventListener('click', function(e) { e.preventDefault(); saveTask(); });
+            document.getElementById('clearDone').addEventListener('click', function(e) { e.preventDefault(); clearDone(); });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && document.getElementById('modalOverlay').classList.contains('open')) closeModal();
+            });
+        }
+
+        function init() {
+            load(); renderTasks(); renderCalendar(); updateHeader(); updateClock(); updateChips(); bind();
+            setInterval(updateClock, 1000); setInterval(save, 15000);
+            window.addEventListener('beforeunload', save);
+        }
+        init();
     </script>
 </body>
 </html>
