@@ -20,6 +20,7 @@
             --blue: #5b9cf5;
             --orange: #f5b84d;
             --pink: #f070a0;
+            --yellow: #f5c842;
             --border: rgba(255,255,255,0.06);
             --border2: rgba(255,255,255,0.1);
             --radius: 18px;
@@ -78,6 +79,57 @@
             font-family: 'SF Mono', 'Courier New', monospace;
         }
 
+        /* Alerta de hoje com botão de alarme */
+        .today-alert {
+            background: var(--surface); border-radius: var(--radius);
+            padding: 14px 16px; margin: 6px 0 14px; border: 1px solid rgba(245,200,66,0.3);
+            display: none; align-items: center; gap: 12px;
+        }
+        .today-alert.show { display: flex; }
+        .today-alert.all-done { border-color: rgba(0,200,150,0.3); }
+        .today-alert-icon { font-size: 26px; flex-shrink: 0; }
+        .today-alert-info { flex: 1; min-width: 0; }
+        .today-alert-title { font-weight: 700; font-size: 13px; color: var(--yellow); }
+        .today-alert.all-done .today-alert-title { color: var(--green); }
+        .today-alert-text { font-size: 11px; color: var(--text2); margin-top: 1px; }
+        .today-alert-badge {
+            background: rgba(245,200,66,0.2); color: var(--yellow); font-weight: 700;
+            font-size: 14px; min-width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .today-alert.all-done .today-alert-badge { background: rgba(0,200,150,0.2); color: var(--green); }
+        .today-alert-btn {
+            padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+            cursor: pointer; border: 1px solid rgba(245,200,66,0.4);
+            background: rgba(245,200,66,0.1); color: var(--yellow);
+            font-family: inherit; white-space: nowrap; transition: all 0.15s;
+        }
+        .today-alert-btn:active { transform: scale(0.95); background: rgba(245,200,66,0.2); }
+        .today-alert.all-done .today-alert-btn { display: none; }
+
+        /* Modal de alarme */
+        .alarm-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 35;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s;
+        }
+        .alarm-modal.open { opacity: 1; pointer-events: auto; }
+        .alarm-dialog {
+            background: var(--surface); border-radius: var(--radius);
+            padding: 22px 20px; width: 90%; max-width: 360px;
+            border: 1px solid var(--border); text-align: center;
+        }
+        .alarm-dialog h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .alarm-dialog .alarm-date { font-size: 13px; color: var(--accent2); font-weight: 600; margin-bottom: 16px; }
+        .alarm-dialog .alarm-tasks { text-align: left; margin-bottom: 16px; max-height: 200px; overflow-y: auto; }
+        .alarm-dialog .alarm-task-item {
+            padding: 8px 10px; border-radius: 8px; font-size: 13px;
+            background: var(--surface2); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+        }
+        .alarm-dialog .alarm-task-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .alarm-dialog .alarm-actions { display: flex; gap: 8px; }
+        .alarm-dialog .alarm-actions .btn { flex: 1; }
+
         .calendar {
             background: var(--surface); border-radius: var(--radius);
             padding: 16px; margin: 6px 0 14px; border: 1px solid var(--border);
@@ -111,17 +163,9 @@
         }
         .calendar-date.today.selected { outline-color: #fff; background: var(--accent); }
         .calendar-date.has-task::after {
-            content: '📌';
-            position: absolute;
-            bottom: 1px;
-            right: 2px;
-            font-size: 9px;
-            line-height: 1;
+            content: '📌'; position: absolute; bottom: 1px; right: 2px; font-size: 9px; line-height: 1;
         }
-        .calendar-date.today.has-task::after {
-            content: '📍';
-            font-size: 10px;
-        }
+        .calendar-date.today.has-task::after { content: '📍'; font-size: 10px; }
 
         .filter-info {
             background: var(--surface); border-radius: var(--radius-sm);
@@ -249,6 +293,27 @@
         .form-input:focus { border-color: var(--accent); }
         .form-input::placeholder { color: var(--text3); }
 
+        /* Checkbox toggle para alarme */
+        .alarm-toggle {
+            display: flex; align-items: center; gap: 10px; padding: 10px 0;
+        }
+        .alarm-toggle-label { font-size: 13px; color: var(--text); font-weight: 500; }
+        .toggle-switch {
+            position: relative; width: 44px; height: 24px; flex-shrink: 0;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--surface3); border-radius: 24px; transition: 0.2s;
+        }
+        .toggle-slider:before {
+            content: ""; position: absolute; height: 18px; width: 18px;
+            left: 3px; bottom: 3px; background: #fff; border-radius: 50%;
+            transition: 0.2s;
+        }
+        input:checked + .toggle-slider { background: var(--accent); }
+        input:checked + .toggle-slider:before { transform: translateX(20px); }
+
         .mini-cal { background: var(--surface2); border-radius: 12px; padding: 12px; border: 1px solid var(--border); }
         .mini-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .mini-cal-month { font-weight: 700; font-size: 14px; color: #fff; }
@@ -350,6 +415,17 @@
             </div>
         </div>
 
+        <!-- Alerta de hoje com botão de alarme -->
+        <div class="today-alert" id="todayAlert">
+            <div class="today-alert-icon" id="todayAlertIcon">🔔</div>
+            <div class="today-alert-info">
+                <div class="today-alert-title" id="todayAlertTitle">Atividades de hoje!</div>
+                <div class="today-alert-text" id="todayAlertText"></div>
+            </div>
+            <div class="today-alert-badge" id="todayAlertBadge">0</div>
+            <button class="today-alert-btn" id="todayAlertBtn">🔔 Alarmes</button>
+        </div>
+
         <div class="calendar">
             <div class="calendar-header">
                 <button class="calendar-nav" id="calPrev">◀</button>
@@ -387,6 +463,7 @@
 
     <button class="fab" id="fab">+</button>
 
+    <!-- Modal de adicionar/editar tarefa -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalSheet">
             <div class="modal-handle"></div>
@@ -409,6 +486,17 @@
                     <div class="mini-cal-selected" id="miniCalSelected">📅 Nenhum dia selecionado</div>
                 </div>
             </div>
+            <!-- Alarme toggle -->
+            <div class="form-group">
+                <label class="form-label">⏰ Alarme</label>
+                <div class="alarm-toggle">
+                    <span class="alarm-toggle-label">Ativar alarme para esta atividade</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="alarmToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
             <div class="form-group">
                 <label class="form-label">📂 Categoria</label>
                 <div class="chips" id="chips">
@@ -425,13 +513,28 @@
         </div>
     </div>
 
+    <!-- Modal de alarme (mostra tarefas com alarme) -->
+    <div class="alarm-modal" id="alarmModal">
+        <div class="alarm-dialog">
+            <h3>⏰ Alarmes para Hoje</h3>
+            <div class="alarm-date" id="alarmDate"></div>
+            <div class="alarm-tasks" id="alarmTasks"></div>
+            <div class="alarm-actions">
+                <button class="btn btn-primary" id="alarmDismiss">OK, entendi!</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
-        const KEY = 'agenda_allan_v3';
+        const KEY = 'agenda_allan_v4';
+        const ALARM_KEY = 'agenda_alarms_v1';
         let tasks = [], dateFilter = null, editId = null, category = 'trabalho';
         let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
         let miniYear = new Date().getFullYear(), miniMonth = new Date().getMonth(), miniDates = [];
+        let alarmEnabled = false;
+        let alarmsTriggered = {}; // { dateStr: true } para não repetir alarme
 
         function today() {
             const d = new Date();
@@ -444,16 +547,19 @@
             if (!tasks.length) {
                 const t = today();
                 tasks = [
-                    { id: uid(), name: 'Reunião de planejamento', dates: [t], category: 'trabalho', done: false, created: Date.now() },
-                    { id: uid(), name: 'Estudar TypeScript', dates: [t], category: 'estudo', done: false, created: Date.now() },
-                    { id: uid(), name: 'Corrida matinal', dates: [t], category: 'exercício', done: true, created: Date.now() },
-                    { id: uid(), name: 'Ler 30 minutos', dates: [t], category: 'pessoal', done: false, created: Date.now() },
+                    { id: uid(), name: 'Reunião de planejamento', dates: [t], category: 'trabalho', done: false, alarm: true, created: Date.now() },
+                    { id: uid(), name: 'Estudar TypeScript', dates: [t], category: 'estudo', done: false, alarm: false, created: Date.now() },
+                    { id: uid(), name: 'Corrida matinal', dates: [t], category: 'exercício', done: true, alarm: true, created: Date.now() },
+                    { id: uid(), name: 'Ler 30 minutos', dates: [t], category: 'pessoal', done: false, alarm: false, created: Date.now() },
                 ];
                 save();
             }
-            tasks.forEach(t => { if (t.date && !t.dates) { t.dates = [t.date]; delete t.date; } if (!t.dates) t.dates = [today()]; });
+            tasks.forEach(t => { if (t.date && !t.dates) { t.dates = [t.date]; delete t.date; } if (!t.dates) t.dates = [today()]; if (t.alarm === undefined) t.alarm = false; });
+            // Carregar alarmes disparados
+            try { const a = localStorage.getItem(ALARM_KEY); if (a) alarmsTriggered = JSON.parse(a); } catch(e) { alarmsTriggered = {}; }
         }
         function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
+        function saveAlarms() { localStorage.setItem(ALARM_KEY, JSON.stringify(alarmsTriggered)); }
 
         function fmtDate(ds) {
             if (!ds) return '';
@@ -491,7 +597,7 @@
                     return `<div class="task ${t.done?'done':''} ${isToday?'today-task':''}" data-id="${id}">
                         <div class="task-check" data-act="toggle" data-id="${id}">${t.done?'✓':''}</div>
                         <div class="task-body" data-act="edit" data-id="${id}">
-                            <div class="task-name">${esc(t.name)}</div>
+                            <div class="task-name">${t.alarm?'🔔 ':''}${esc(t.name)}</div>
                             <div class="task-meta">
                                 ${datesStr?`<span class="date-highlight">📅 ${datesStr}</span>`:''}
                                 <span class="task-dot dot-${t.category}"></span> ${t.category.charAt(0).toUpperCase()+t.category.slice(1)}
@@ -506,6 +612,7 @@
                 }).join('');
             }
             updateStats();
+            updateTodayAlert();
         }
 
         function updateStats() {
@@ -528,6 +635,110 @@
                 document.getElementById('progressTitle').textContent = `${done} de ${total} concluídas`;
                 document.getElementById('progressSub').textContent = `${total-done} pendentes`;
             }
+        }
+
+        // ==================== ALARME ====================
+        function updateTodayAlert() {
+            const td = today();
+            const todayTasks = tasks.filter(t => t.dates && t.dates.includes(td) && !t.done);
+            const alarmTasks = todayTasks.filter(t => t.alarm);
+            const alert = document.getElementById('todayAlert');
+
+            if (todayTasks.length > 0) {
+                alert.classList.add('show');
+                alert.classList.remove('all-done');
+                document.getElementById('todayAlertIcon').textContent = '🔔';
+                document.getElementById('todayAlertTitle').textContent = 'Atividades de hoje!';
+                document.getElementById('todayAlertText').textContent = `${todayTasks.length} pendente(s) • ${alarmTasks.length} com alarme`;
+                document.getElementById('todayAlertBadge').textContent = todayTasks.length;
+                document.getElementById('todayAlertBtn').style.display = alarmTasks.length > 0 ? 'inline-block' : 'none';
+
+                // Disparar alarme automático se ainda não foi disparado hoje
+                if (alarmTasks.length > 0 && !alarmsTriggered[td]) {
+                    triggerAlarmModal(alarmTasks, td);
+                    alarmsTriggered[td] = true;
+                    saveAlarms();
+                }
+            } else {
+                alert.classList.add('show');
+                alert.classList.add('all-done');
+                document.getElementById('todayAlertIcon').textContent = '✅';
+                document.getElementById('todayAlertTitle').textContent = 'Nada pendente hoje';
+                document.getElementById('todayAlertText').textContent = 'Nenhuma atividade para hoje';
+                document.getElementById('todayAlertBadge').textContent = '✓';
+                document.getElementById('todayAlertBtn').style.display = 'none';
+            }
+        }
+
+        function triggerAlarmModal(alarmTasks, dateStr) {
+            document.getElementById('alarmDate').textContent = '📅 ' + fmtDate(dateStr);
+            document.getElementById('alarmTasks').innerHTML = alarmTasks.map(t => {
+                const dotColor = t.category === 'trabalho' ? 'var(--blue)' :
+                    t.category === 'estudo' ? '#f07070' :
+                    t.category === 'exercício' ? 'var(--green)' : 'var(--pink)';
+                return `<div class="alarm-task-item">
+                    <span class="alarm-task-dot" style="background:${dotColor}"></span>
+                    ${esc(t.name)}
+                </div>`;
+            }).join('');
+            document.getElementById('alarmModal').classList.add('open');
+
+            // Tocar som de alarme
+            playAlarmSound();
+
+            // Enviar notificação do navegador
+            sendBrowserNotification(alarmTasks);
+        }
+
+        function playAlarmSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                // Tocar 3 beeps
+                for (let i = 0; i < 3; i++) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = 800;
+                    osc.type = 'sine';
+                    gain.gain.value = 0.3;
+                    osc.start(ctx.currentTime + i * 0.4);
+                    osc.stop(ctx.currentTime + i * 0.4 + 0.2);
+                }
+            } catch(e) {
+                console.log('Som não disponível');
+            }
+        }
+
+        function sendBrowserNotification(alarmTasks) {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'granted') {
+                const names = alarmTasks.map(t => t.name).join(', ');
+                try {
+                    const n = new Notification('⏰ Agenda do Allan - Alarmes!', {
+                        body: `Você tem ${alarmTasks.length} atividade(s) com alarme: ${names}`,
+                        icon: '📋',
+                        tag: 'agenda-alarm',
+                        requireInteraction: true
+                    });
+                    n.onclick = () => { window.focus(); n.close(); };
+                    setTimeout(() => n.close(), 10000);
+                } catch(e) {}
+            } else if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        function openAlarmModal() {
+            const td = today();
+            const alarmTasks = tasks.filter(t => t.dates && t.dates.includes(td) && !t.done && t.alarm);
+            if (alarmTasks.length > 0) {
+                triggerAlarmModal(alarmTasks, td);
+            }
+        }
+
+        function dismissAlarm() {
+            document.getElementById('alarmModal').classList.remove('open');
         }
 
         function renderCalendar() {
@@ -630,6 +841,8 @@
                 document.getElementById('editBadge').style.display = 'block';
                 document.getElementById('btnSave').textContent = '💾 Atualizar';
                 input.value = t.name; miniDates = [...(t.dates||[today()])]; category = t.category;
+                alarmEnabled = t.alarm || false;
+                document.getElementById('alarmToggle').checked = alarmEnabled;
                 if (miniDates.length) { const [y,m] = miniDates[0].split('-'); miniYear = +y; miniMonth = +m-1; }
             } else {
                 editId = null;
@@ -637,6 +850,8 @@
                 document.getElementById('editBadge').style.display = 'none';
                 document.getElementById('btnSave').textContent = '💾 Salvar';
                 input.value = ''; miniDates = dateFilter?[dateFilter]:[today()]; category = 'trabalho';
+                alarmEnabled = false;
+                document.getElementById('alarmToggle').checked = false;
                 const [y,m] = miniDates[0].split('-'); miniYear = +y; miniMonth = +m-1;
             }
             updateChips(); renderMiniCal();
@@ -655,12 +870,13 @@
             const input = document.getElementById('inputName'), name = input.value.trim();
             if (!name) { toast('⚠️ Digite o nome'); input.focus(); return; }
             if (!miniDates.length) { toast('⚠️ Selecione pelo menos um dia'); return; }
+            alarmEnabled = document.getElementById('alarmToggle').checked;
             if (editId) {
                 const t = tasks.find(x => x.id === editId);
-                if (t) { t.name = name; t.dates = [...miniDates]; t.category = category; }
+                if (t) { t.name = name; t.dates = [...miniDates]; t.category = category; t.alarm = alarmEnabled; }
                 toast('✅ Atualizada!');
             } else {
-                tasks.push({ id: uid(), name, dates: [...miniDates], category, done: false, created: Date.now() });
+                tasks.push({ id: uid(), name, dates: [...miniDates], category, done: false, alarm: alarmEnabled, created: Date.now() });
                 toast('✅ Adicionada!');
             }
             save();
@@ -699,6 +915,21 @@
             document.getElementById('calNext').addEventListener('click', function(e) { e.preventDefault(); calMove(1); });
             document.getElementById('clearFilterBtn').addEventListener('click', function(e) { e.preventDefault(); clearFilter(); });
 
+            // Alerta de hoje
+            document.getElementById('todayAlert').addEventListener('click', function(e) {
+                if (e.target.closest('.today-alert-btn')) return;
+                dateFilter = today(); renderTasks(); renderCalendar();
+            });
+            document.getElementById('todayAlertBtn').addEventListener('click', function(e) {
+                e.stopPropagation(); openAlarmModal();
+            });
+
+            // Modal de alarme
+            document.getElementById('alarmDismiss').addEventListener('click', function() { dismissAlarm(); });
+            document.getElementById('alarmModal').addEventListener('click', function(e) {
+                if (e.target === this) dismissAlarm();
+            });
+
             document.getElementById('miniCalDates').addEventListener('click', function(e) {
                 const d = e.target.closest('.mini-cal-date'); if (!d) return; e.stopPropagation(); miniToggle(d.dataset.date);
             });
@@ -721,14 +952,40 @@
             document.getElementById('btnSave').addEventListener('click', function(e) { e.preventDefault(); saveTask(); });
             document.getElementById('clearDone').addEventListener('click', function(e) { e.preventDefault(); clearDone(); });
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && document.getElementById('modalOverlay').classList.contains('open')) closeModal();
+                if (e.key === 'Escape') {
+                    if (document.getElementById('alarmModal').classList.contains('open')) dismissAlarm();
+                    else if (document.getElementById('modalOverlay').classList.contains('open')) closeModal();
+                }
             });
         }
 
         function init() {
-            load(); renderTasks(); renderCalendar(); updateHeader(); updateClock(); updateChips(); bind();
-            setInterval(updateClock, 1000); setInterval(save, 15000);
+            load();
+            renderTasks();
+            renderCalendar();
+            updateHeader();
+            updateClock();
+            updateChips();
+            updateTodayAlert();
+            bind();
+            setInterval(updateClock, 1000);
+            setInterval(save, 15000);
+            // Verificar alarmes a cada minuto
+            setInterval(() => {
+                const td = today();
+                const alarmTasks = tasks.filter(t => t.dates && t.dates.includes(td) && !t.done && t.alarm);
+                if (alarmTasks.length > 0 && !alarmsTriggered[td]) {
+                    triggerAlarmModal(alarmTasks, td);
+                    alarmsTriggered[td] = true;
+                    saveAlarms();
+                    updateTodayAlert();
+                }
+            }, 60000);
             window.addEventListener('beforeunload', save);
+            // Solicitar permissão de notificação
+            if ('Notification' in window && Notification.permission === 'default') {
+                setTimeout(() => Notification.requestPermission(), 3000);
+            }
         }
         init();
     </script>
