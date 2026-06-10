@@ -79,11 +79,11 @@
             font-family: 'SF Mono', 'Courier New', monospace;
         }
 
-        /* Alerta de hoje com botão de alarme */
+        /* Alerta de hoje */
         .today-alert {
             background: var(--surface); border-radius: var(--radius);
             padding: 14px 16px; margin: 6px 0 14px; border: 1px solid rgba(245,200,66,0.3);
-            display: none; align-items: center; gap: 12px;
+            display: none; align-items: center; gap: 12px; cursor: pointer;
         }
         .today-alert.show { display: flex; }
         .today-alert.all-done { border-color: rgba(0,200,150,0.3); }
@@ -293,14 +293,12 @@
         .form-input:focus { border-color: var(--accent); }
         .form-input::placeholder { color: var(--text3); }
 
-        /* Checkbox toggle para alarme */
+        /* Toggle alarme */
         .alarm-toggle {
             display: flex; align-items: center; gap: 10px; padding: 10px 0;
         }
         .alarm-toggle-label { font-size: 13px; color: var(--text); font-weight: 500; }
-        .toggle-switch {
-            position: relative; width: 44px; height: 24px; flex-shrink: 0;
-        }
+        .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .toggle-slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -308,8 +306,7 @@
         }
         .toggle-slider:before {
             content: ""; position: absolute; height: 18px; width: 18px;
-            left: 3px; bottom: 3px; background: #fff; border-radius: 50%;
-            transition: 0.2s;
+            left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.2s;
         }
         input:checked + .toggle-slider { background: var(--accent); }
         input:checked + .toggle-slider:before { transform: translateX(20px); }
@@ -395,6 +392,14 @@
             transition: transform 0.35s ease; border: 1px solid rgba(255,255,255,0.1);
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Indicador de salvamento */
+        .save-indicator {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            font-size: 10px; color: var(--green); font-weight: 600;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .save-indicator.show { opacity: 1; }
     </style>
 </head>
 <body>
@@ -415,7 +420,6 @@
             </div>
         </div>
 
-        <!-- Alerta de hoje com botão de alarme -->
         <div class="today-alert" id="todayAlert">
             <div class="today-alert-icon" id="todayAlertIcon">🔔</div>
             <div class="today-alert-info">
@@ -463,7 +467,6 @@
 
     <button class="fab" id="fab">+</button>
 
-    <!-- Modal de adicionar/editar tarefa -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modalSheet">
             <div class="modal-handle"></div>
@@ -486,7 +489,6 @@
                     <div class="mini-cal-selected" id="miniCalSelected">📅 Nenhum dia selecionado</div>
                 </div>
             </div>
-            <!-- Alarme toggle -->
             <div class="form-group">
                 <label class="form-label">⏰ Alarme</label>
                 <div class="alarm-toggle">
@@ -513,7 +515,6 @@
         </div>
     </div>
 
-    <!-- Modal de alarme (mostra tarefas com alarme) -->
     <div class="alarm-modal" id="alarmModal">
         <div class="alarm-dialog">
             <h3>⏰ Alarmes para Hoje</h3>
@@ -526,62 +527,175 @@
     </div>
 
     <div class="toast" id="toast"></div>
+    <div class="save-indicator" id="saveIndicator">💾 Salvo!</div>
 
     <script>
-        const KEY = 'agenda_allan_v4';
-        const ALARM_KEY = 'agenda_alarms_v1';
-        let tasks = [], dateFilter = null, editId = null, category = 'trabalho';
-        let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
-        let miniYear = new Date().getFullYear(), miniMonth = new Date().getMonth(), miniDates = [];
-        let alarmEnabled = false;
-        let alarmsTriggered = {}; // { dateStr: true } para não repetir alarme
+        // ==================== CONFIGURAÇÃO ====================
+        const STORAGE_KEY = 'agenda_allan_v5';
 
+        // ==================== ESTADO ====================
+        let tasks = [];
+        let dateFilter = null;
+        let editId = null;
+        let category = 'trabalho';
+        let calYear = new Date().getFullYear();
+        let calMonth = new Date().getMonth();
+        let miniYear = new Date().getFullYear();
+        let miniMonth = new Date().getMonth();
+        let miniDates = [];
+        let alarmEnabled = false;
+        let alarmsTriggered = {};
+
+        // ==================== UTILITÁRIOS ====================
         function today() {
             const d = new Date();
-            return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         }
-        function uid() { return 't'+Date.now()+Math.random().toString(36).substr(2,6); }
 
-        function load() {
-            try { const s = localStorage.getItem(KEY); if (s) tasks = JSON.parse(s); if (!Array.isArray(tasks)) tasks = []; } catch(e) { tasks = []; }
-            if (!tasks.length) {
-                const t = today();
-                tasks = [
-                    { id: uid(), name: 'Reunião de planejamento', dates: [t], category: 'trabalho', done: false, alarm: true, created: Date.now() },
-                    { id: uid(), name: 'Estudar TypeScript', dates: [t], category: 'estudo', done: false, alarm: false, created: Date.now() },
-                    { id: uid(), name: 'Corrida matinal', dates: [t], category: 'exercício', done: true, alarm: true, created: Date.now() },
-                    { id: uid(), name: 'Ler 30 minutos', dates: [t], category: 'pessoal', done: false, alarm: false, created: Date.now() },
-                ];
-                save();
+        function uid() {
+            return 't_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        // ==================== PERSISTÊNCIA ====================
+        function saveTasks() {
+            try {
+                const json = JSON.stringify(tasks);
+                localStorage.setItem(STORAGE_KEY, json);
+                // Verificar se salvou corretamente
+                const verify = localStorage.getItem(STORAGE_KEY);
+                if (verify === json) {
+                    showSaveIndicator();
+                    console.log('✅ Dados salvos com sucesso! ' + tasks.length + ' tarefas');
+                } else {
+                    console.error('❌ Erro na verificação do salvamento');
+                }
+            } catch (e) {
+                console.error('❌ Erro ao salvar:', e);
+                // Tentar limpar storage se estiver cheio
+                if (e.name === 'QuotaExceededError') {
+                    toast('⚠️ Armazenamento cheio! Limpe dados antigos');
+                }
             }
-            tasks.forEach(t => { if (t.date && !t.dates) { t.dates = [t.date]; delete t.date; } if (!t.dates) t.dates = [today()]; if (t.alarm === undefined) t.alarm = false; });
-            // Carregar alarmes disparados
-            try { const a = localStorage.getItem(ALARM_KEY); if (a) alarmsTriggered = JSON.parse(a); } catch(e) { alarmsTriggered = {}; }
         }
-        function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
-        function saveAlarms() { localStorage.setItem(ALARM_KEY, JSON.stringify(alarmsTriggered)); }
 
+        function loadTasks() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) {
+                        tasks = parsed;
+                        console.log('📂 Dados carregados: ' + tasks.length + ' tarefas');
+                    } else {
+                        tasks = [];
+                        console.log('📂 Dados inválidos, iniciando vazio');
+                    }
+                } else {
+                    console.log('📂 Nenhum dado salvo, criando exemplos');
+                    tasks = createSampleTasks();
+                    saveTasks();
+                }
+                // Migrar dados antigos
+                let migrated = false;
+                tasks.forEach(t => {
+                    if (t.date && !t.dates) {
+                        t.dates = [t.date];
+                        delete t.date;
+                        migrated = true;
+                    }
+                    if (!t.dates) {
+                        t.dates = [today()];
+                        migrated = true;
+                    }
+                    if (t.alarm === undefined) {
+                        t.alarm = false;
+                        migrated = true;
+                    }
+                });
+                if (migrated) {
+                    console.log('📂 Dados migrados para nova versão');
+                    saveTasks();
+                }
+            } catch (e) {
+                console.error('❌ Erro ao carregar:', e);
+                tasks = createSampleTasks();
+                saveTasks();
+            }
+        }
+
+        function createSampleTasks() {
+            const t = today();
+            return [
+                { id: uid(), name: 'Reunião de planejamento', dates: [t], category: 'trabalho', done: false, alarm: true, created: Date.now() },
+                { id: uid(), name: 'Estudar TypeScript', dates: [t], category: 'estudo', done: false, alarm: false, created: Date.now() },
+                { id: uid(), name: 'Corrida matinal', dates: [t], category: 'exercício', done: true, alarm: true, created: Date.now() },
+                { id: uid(), name: 'Ler 30 minutos', dates: [t], category: 'pessoal', done: false, alarm: false, created: Date.now() },
+            ];
+        }
+
+        function loadAlarmsTriggered() {
+            try {
+                const saved = localStorage.getItem('agenda_alarms_triggered');
+                if (saved) alarmsTriggered = JSON.parse(saved);
+            } catch (e) {
+                alarmsTriggered = {};
+            }
+        }
+
+        function saveAlarmsTriggered() {
+            try {
+                localStorage.setItem('agenda_alarms_triggered', JSON.stringify(alarmsTriggered));
+            } catch (e) {}
+        }
+
+        function showSaveIndicator() {
+            const el = document.getElementById('saveIndicator');
+            el.classList.add('show');
+            clearTimeout(window._saveIndicatorTimeout);
+            window._saveIndicatorTimeout = setTimeout(() => el.classList.remove('show'), 1500);
+        }
+
+        // ==================== FORMATAÇÃO ====================
         function fmtDate(ds) {
             if (!ds) return '';
-            const [y,m,d] = ds.split('-').map(Number), dt = new Date(y,m-1,d);
-            const td = today(), tmr = new Date(); tmr.setDate(tmr.getDate()+1);
-            const yst = new Date(); yst.setDate(yst.getDate()-1);
+            const [y, m, d] = ds.split('-').map(Number);
+            const dt = new Date(y, m - 1, d);
+            const td = today();
+            const tmr = new Date();
+            tmr.setDate(tmr.getDate() + 1);
+            const yst = new Date();
+            yst.setDate(yst.getDate() - 1);
             if (ds === td) return 'Hoje';
             if (ds === tmr.toISOString().split('T')[0]) return 'Amanhã';
             if (ds === yst.toISOString().split('T')[0]) return 'Ontem';
-            return dt.toLocaleDateString('pt-BR', { day:'numeric', month:'short' });
+            return dt.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
         }
-        function fmtDates(arr) { return arr && arr.length ? arr.map(d => fmtDate(d)).join(', ') : ''; }
-        function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-        function filtered() {
+        function fmtDates(arr) {
+            return arr && arr.length ? arr.map(d => fmtDate(d)).join(', ') : '';
+        }
+
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        // ==================== FILTROS ====================
+        function getFilteredTasks() {
             if (!dateFilter) return [];
-            return tasks.filter(t => t.dates && t.dates.includes(dateFilter)).sort((a,b) => b.created - a.created);
+            return tasks
+                .filter(t => t.dates && t.dates.includes(dateFilter))
+                .sort((a, b) => b.created - a.created);
         }
 
+        // ==================== RENDER ====================
         function renderTasks() {
-            const list = document.getElementById('taskList'), f = filtered(), td = today();
+            const list = document.getElementById('taskList');
+            const f = getFilteredTasks();
+            const td = today();
             const fi = document.getElementById('filterInfo');
+
             if (!dateFilter) {
                 fi.classList.remove('show');
                 list.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">Toque em um dia no calendário</div></div>';
@@ -593,20 +707,21 @@
                 fi.classList.add('show');
                 document.getElementById('filterDateValue').textContent = fmtDate(dateFilter);
                 list.innerHTML = f.map(t => {
-                    const id = t.id, datesStr = fmtDates(t.dates), isToday = t.dates && t.dates.includes(td) && !t.done;
-                    return `<div class="task ${t.done?'done':''} ${isToday?'today-task':''}" data-id="${id}">
-                        <div class="task-check" data-act="toggle" data-id="${id}">${t.done?'✓':''}</div>
-                        <div class="task-body" data-act="edit" data-id="${id}">
-                            <div class="task-name">${t.alarm?'🔔 ':''}${esc(t.name)}</div>
+                    const datesStr = fmtDates(t.dates);
+                    const isToday = t.dates && t.dates.includes(td) && !t.done;
+                    return `<div class="task ${t.done ? 'done' : ''} ${isToday ? 'today-task' : ''}" data-id="${t.id}">
+                        <div class="task-check" data-act="toggle" data-id="${t.id}">${t.done ? '✓' : ''}</div>
+                        <div class="task-body" data-act="edit" data-id="${t.id}">
+                            <div class="task-name">${t.alarm ? '🔔 ' : ''}${esc(t.name)}</div>
                             <div class="task-meta">
-                                ${datesStr?`<span class="date-highlight">📅 ${datesStr}</span>`:''}
-                                <span class="task-dot dot-${t.category}"></span> ${t.category.charAt(0).toUpperCase()+t.category.slice(1)}
-                                ${t.dates&&t.dates.length>1?`<span style="color:var(--accent2);font-weight:600;">+${t.dates.length-1}</span>`:''}
+                                ${datesStr ? `<span class="date-highlight">📅 ${datesStr}</span>` : ''}
+                                <span class="task-dot dot-${t.category}"></span> ${t.category.charAt(0).toUpperCase() + t.category.slice(1)}
+                                ${t.dates && t.dates.length > 1 ? `<span style="color:var(--accent2);font-weight:600;">+${t.dates.length - 1}</span>` : ''}
                             </div>
                         </div>
                         <div class="task-actions">
-                            <button class="task-btn" data-act="edit" data-id="${id}">✏️</button>
-                            <button class="task-btn del" data-act="delete" data-id="${id}">🗑️</button>
+                            <button class="task-btn" data-act="edit" data-id="${t.id}">✏️</button>
+                            <button class="task-btn del" data-act="delete" data-id="${t.id}">🗑️</button>
                         </div>
                     </div>`;
                 }).join('');
@@ -616,12 +731,17 @@
         }
 
         function updateStats() {
-            const f = filtered(), total = f.length, done = f.filter(t => t.done).length;
-            const pct = total ? Math.round((done/total)*100) : 0;
-            document.getElementById('progressPct').textContent = pct+'%';
-            const circ = 2*Math.PI*23, fill = document.getElementById('progressFill');
+            const f = getFilteredTasks();
+            const total = f.length;
+            const done = f.filter(t => t.done).length;
+            const pct = total ? Math.round((done / total) * 100) : 0;
+
+            document.getElementById('progressPct').textContent = pct + '%';
+            const circ = 2 * Math.PI * 23;
+            const fill = document.getElementById('progressFill');
             fill.style.strokeDasharray = circ;
-            fill.style.strokeDashoffset = circ - (pct/100)*circ;
+            fill.style.strokeDashoffset = circ - (pct / 100) * circ;
+
             if (!dateFilter) {
                 document.getElementById('progressTitle').textContent = 'Selecione uma data';
                 document.getElementById('progressSub').textContent = 'Toque em um dia no calendário';
@@ -633,11 +753,10 @@
                 document.getElementById('progressSub').textContent = `${done}/${total} atividades feitas`;
             } else {
                 document.getElementById('progressTitle').textContent = `${done} de ${total} concluídas`;
-                document.getElementById('progressSub').textContent = `${total-done} pendentes`;
+                document.getElementById('progressSub').textContent = `${total - done} pendentes`;
             }
         }
 
-        // ==================== ALARME ====================
         function updateTodayAlert() {
             const td = today();
             const todayTasks = tasks.filter(t => t.dates && t.dates.includes(td) && !t.done);
@@ -652,13 +771,6 @@
                 document.getElementById('todayAlertText').textContent = `${todayTasks.length} pendente(s) • ${alarmTasks.length} com alarme`;
                 document.getElementById('todayAlertBadge').textContent = todayTasks.length;
                 document.getElementById('todayAlertBtn').style.display = alarmTasks.length > 0 ? 'inline-block' : 'none';
-
-                // Disparar alarme automático se ainda não foi disparado hoje
-                if (alarmTasks.length > 0 && !alarmsTriggered[td]) {
-                    triggerAlarmModal(alarmTasks, td);
-                    alarmsTriggered[td] = true;
-                    saveAlarms();
-                }
             } else {
                 alert.classList.add('show');
                 alert.classList.add('all-done');
@@ -670,10 +782,287 @@
             }
         }
 
+        function renderCalendar() {
+            const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            document.getElementById('calMonth').textContent = months[calMonth] + ' ' + calYear;
+            document.getElementById('calWeekdays').innerHTML = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+                .map(d => `<div class="calendar-weekday">${d}</div>`).join('');
+
+            const firstDay = new Date(calYear, calMonth, 1).getDay();
+            const daysIn = new Date(calYear, calMonth + 1, 0).getDate();
+            const daysPrev = new Date(calYear, calMonth, 0).getDate();
+            const td = today();
+            const taskDates = new Set();
+            tasks.forEach(t => { if (t.dates) t.dates.forEach(d => taskDates.add(d)); });
+
+            let h = '';
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = daysPrev - i;
+                const m = calMonth === 0 ? 11 : calMonth - 1;
+                const y = calMonth === 0 ? calYear - 1 : calYear;
+                h += `<div class="calendar-date other" data-date="${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}">${day}</div>`;
+            }
+            for (let day = 1; day <= daysIn; day++) {
+                const ds = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                let cls = 'calendar-date';
+                if (ds === td) cls += ' today';
+                if (ds === dateFilter) cls += ' selected';
+                if (taskDates.has(ds)) cls += ' has-task';
+                h += `<div class="${cls}" data-date="${ds}">${day}</div>`;
+            }
+            const total = firstDay + daysIn;
+            const rem = total <= 35 ? 35 - total : 42 - total;
+            for (let day = 1; day <= rem; day++) {
+                const m = calMonth === 11 ? 0 : calMonth + 1;
+                const y = calMonth === 11 ? calYear + 1 : calYear;
+                h += `<div class="calendar-date other" data-date="${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}">${day}</div>`;
+            }
+            document.getElementById('calDates').innerHTML = h;
+        }
+
+        function renderMiniCal() {
+            const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            document.getElementById('miniCalMonth').textContent = months[miniMonth] + ' ' + miniYear;
+            document.getElementById('miniCalDays').innerHTML = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+                .map(d => `<div class="mini-cal-day">${d}</div>`).join('');
+
+            const firstDay = new Date(miniYear, miniMonth, 1).getDay();
+            const daysIn = new Date(miniYear, miniMonth + 1, 0).getDate();
+            const daysPrev = new Date(miniYear, miniMonth, 0).getDate();
+            const td = today();
+
+            let h = '';
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = daysPrev - i;
+                const m = miniMonth === 0 ? 11 : miniMonth - 1;
+                const y = miniMonth === 0 ? miniYear - 1 : miniYear;
+                h += `<div class="mini-cal-date other" data-date="${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}">${day}</div>`;
+            }
+            for (let day = 1; day <= daysIn; day++) {
+                const ds = miniYear + '-' + String(miniMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                let cls = 'mini-cal-date';
+                if (ds === td) cls += ' today';
+                if (miniDates.includes(ds)) cls += ' sel';
+                h += `<div class="${cls}" data-date="${ds}">${day}</div>`;
+            }
+            const total = firstDay + daysIn;
+            const rem = total <= 35 ? 35 - total : 42 - total;
+            for (let day = 1; day <= rem; day++) {
+                const m = miniMonth === 11 ? 0 : miniMonth + 1;
+                const y = miniMonth === 11 ? miniYear + 1 : miniYear;
+                h += `<div class="mini-cal-date other" data-date="${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}">${day}</div>`;
+            }
+            document.getElementById('miniCalDates').innerHTML = h;
+            updateMiniSel();
+        }
+
+        function updateMiniSel() {
+            const el = document.getElementById('miniCalSelected');
+            if (!miniDates.length) {
+                el.innerHTML = '📅 Nenhum dia selecionado';
+            } else if (miniDates.length <= 5) {
+                el.innerHTML = miniDates.map(d =>
+                    `<span class="mini-cal-tag">${fmtDate(d)} <span class="remove" data-date="${d}">✕</span></span>`
+                ).join('');
+            } else {
+                el.innerHTML = `<span class="mini-cal-tag">${miniDates.length} dias selecionados</span>`;
+            }
+        }
+
+        // ==================== AÇÕES ====================
+        function calMove(d) {
+            calMonth += d;
+            if (calMonth > 11) { calMonth = 0; calYear++; } else if (calMonth < 0) { calMonth = 11; calYear--; }
+            renderCalendar();
+        }
+
+        function calSelect(ds) {
+            dateFilter = ds;
+            renderTasks();
+            renderCalendar();
+        }
+
+        function clearFilter() {
+            dateFilter = null;
+            renderTasks();
+            renderCalendar();
+        }
+
+        function miniToggle(ds) {
+            const idx = miniDates.indexOf(ds);
+            if (idx > -1) miniDates.splice(idx, 1);
+            else miniDates.push(ds);
+            miniDates.sort();
+            renderMiniCal();
+        }
+
+        function miniRemove(ds) {
+            miniDates = miniDates.filter(d => d !== ds);
+            renderMiniCal();
+        }
+
+        function miniMove(d) {
+            miniMonth += d;
+            if (miniMonth > 11) { miniMonth = 0; miniYear++; } else if (miniMonth < 0) { miniMonth = 11; miniYear--; }
+            renderMiniCal();
+        }
+
+        function toggleTask(id) {
+            const t = tasks.find(x => x.id === id);
+            if (t) {
+                t.done = !t.done;
+                saveTasks();
+                renderTasks();
+                renderCalendar();
+                toast(t.done ? '✅ Concluída!' : '🔄 Reaberta');
+            }
+        }
+
+        function deleteTask(id) {
+            const before = tasks.length;
+            tasks = tasks.filter(x => x.id !== id);
+            if (tasks.length < before) {
+                if (editId === id) closeModal();
+                saveTasks();
+                renderTasks();
+                renderCalendar();
+                toast('🗑️ Removida');
+            }
+        }
+
+        function clearDone() {
+            if (!dateFilter) {
+                toast('ℹ️ Selecione uma data primeiro');
+                return;
+            }
+            const ids = getFilteredTasks().filter(t => t.done).map(t => t.id);
+            if (!ids.length) {
+                toast('ℹ️ Nada para limpar');
+                return;
+            }
+            tasks = tasks.filter(t => !ids.includes(t.id));
+            saveTasks();
+            renderTasks();
+            renderCalendar();
+            toast(`🧹 ${ids.length} removida(s)`);
+        }
+
+        // ==================== MODAL ====================
+        function openModal(id) {
+            const input = document.getElementById('inputName');
+            if (id) {
+                const t = tasks.find(x => x.id === id);
+                if (!t) return;
+                editId = id;
+                document.getElementById('modalTitle').textContent = 'Editar Atividade';
+                document.getElementById('editBadge').style.display = 'block';
+                document.getElementById('btnSave').textContent = '💾 Atualizar';
+                input.value = t.name;
+                miniDates = [...(t.dates || [today()])];
+                category = t.category;
+                alarmEnabled = t.alarm || false;
+                document.getElementById('alarmToggle').checked = alarmEnabled;
+                if (miniDates.length) {
+                    const [y, m] = miniDates[0].split('-');
+                    miniYear = +y;
+                    miniMonth = +m - 1;
+                }
+            } else {
+                editId = null;
+                document.getElementById('modalTitle').textContent = 'Nova Atividade';
+                document.getElementById('editBadge').style.display = 'none';
+                document.getElementById('btnSave').textContent = '💾 Salvar';
+                input.value = '';
+                miniDates = dateFilter ? [dateFilter] : [today()];
+                category = 'trabalho';
+                alarmEnabled = false;
+                document.getElementById('alarmToggle').checked = false;
+                const [y, m] = miniDates[0].split('-');
+                miniYear = +y;
+                miniMonth = +m - 1;
+            }
+            updateChips();
+            renderMiniCal();
+            document.getElementById('modalOverlay').classList.add('open');
+            setTimeout(() => input.focus(), 400);
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('open');
+            editId = null;
+            miniDates = [];
+        }
+
+        function setCategory(cat) {
+            category = cat;
+            updateChips();
+        }
+
+        function updateChips() {
+            document.querySelectorAll('.chip').forEach(c => {
+                c.classList.remove('active');
+                if (c.dataset.cat === category) c.classList.add('active');
+            });
+        }
+
+        function saveTask() {
+            const input = document.getElementById('inputName');
+            const name = input.value.trim();
+
+            if (!name) {
+                toast('⚠️ Digite o nome');
+                input.focus();
+                return;
+            }
+            if (!miniDates.length) {
+                toast('⚠️ Selecione pelo menos um dia');
+                return;
+            }
+
+            alarmEnabled = document.getElementById('alarmToggle').checked;
+
+            if (editId) {
+                const t = tasks.find(x => x.id === editId);
+                if (t) {
+                    t.name = name;
+                    t.dates = [...miniDates];
+                    t.category = category;
+                    t.alarm = alarmEnabled;
+                }
+                toast('✅ Atualizada!');
+            } else {
+                tasks.push({
+                    id: uid(),
+                    name: name,
+                    dates: [...miniDates],
+                    category: category,
+                    done: false,
+                    alarm: alarmEnabled,
+                    created: Date.now()
+                });
+                toast('✅ Adicionada!');
+            }
+
+            saveTasks();
+
+            if (dateFilter && !miniDates.includes(dateFilter)) {
+                dateFilter = miniDates[0];
+                const [y, m] = miniDates[0].split('-');
+                calYear = +y;
+                calMonth = +m - 1;
+            }
+
+            renderTasks();
+            renderCalendar();
+            closeModal();
+        }
+
+        // ==================== ALARME ====================
         function triggerAlarmModal(alarmTasks, dateStr) {
             document.getElementById('alarmDate').textContent = '📅 ' + fmtDate(dateStr);
             document.getElementById('alarmTasks').innerHTML = alarmTasks.map(t => {
-                const dotColor = t.category === 'trabalho' ? 'var(--blue)' :
+                const dotColor =
+                    t.category === 'trabalho' ? 'var(--blue)' :
                     t.category === 'estudo' ? '#f07070' :
                     t.category === 'exercício' ? 'var(--green)' : 'var(--pink)';
                 return `<div class="alarm-task-item">
@@ -682,18 +1071,13 @@
                 </div>`;
             }).join('');
             document.getElementById('alarmModal').classList.add('open');
-
-            // Tocar som de alarme
             playAlarmSound();
-
-            // Enviar notificação do navegador
             sendBrowserNotification(alarmTasks);
         }
 
         function playAlarmSound() {
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                // Tocar 3 beeps
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
                 for (let i = 0; i < 3; i++) {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
@@ -705,9 +1089,7 @@
                     osc.start(ctx.currentTime + i * 0.4);
                     osc.stop(ctx.currentTime + i * 0.4 + 0.2);
                 }
-            } catch(e) {
-                console.log('Som não disponível');
-            }
+            } catch (e) {}
         }
 
         function sendBrowserNotification(alarmTasks) {
@@ -721,9 +1103,10 @@
                         tag: 'agenda-alarm',
                         requireInteraction: true
                     });
-                    n.onclick = () => { window.focus(); n.close(); };
+                    n.onclick = () => { window.focus();
+                        n.close(); };
                     setTimeout(() => n.close(), 10000);
-                } catch(e) {}
+                } catch (e) {}
             } else if (Notification.permission === 'default') {
                 Notification.requestPermission();
             }
@@ -741,252 +1124,185 @@
             document.getElementById('alarmModal').classList.remove('open');
         }
 
-        function renderCalendar() {
-            const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-            document.getElementById('calMonth').textContent = months[calMonth]+' '+calYear;
-            document.getElementById('calWeekdays').innerHTML = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="calendar-weekday">${d}</div>`).join('');
-            const firstDay = new Date(calYear,calMonth,1).getDay(), daysIn = new Date(calYear,calMonth+1,0).getDate();
-            const daysPrev = new Date(calYear,calMonth,0).getDate(), td = today();
-            const taskDates = new Set(); tasks.forEach(t => { if (t.dates) t.dates.forEach(d => taskDates.add(d)); });
-            let h = '';
-            for (let i = firstDay-1; i >= 0; i--) {
-                const day = daysPrev-i, m = calMonth===0?11:calMonth-1, y = calMonth===0?calYear-1:calYear;
-                h += `<div class="calendar-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
+        function checkAlarms() {
+            const td = today();
+            const alarmTasks = tasks.filter(t => t.dates && t.dates.includes(td) && !t.done && t.alarm);
+            if (alarmTasks.length > 0 && !alarmsTriggered[td]) {
+                triggerAlarmModal(alarmTasks, td);
+                alarmsTriggered[td] = true;
+                saveAlarmsTriggered();
+                updateTodayAlert();
             }
-            for (let day = 1; day <= daysIn; day++) {
-                const ds = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-                let cls = 'calendar-date';
-                if (ds === td) cls += ' today';
-                if (ds === dateFilter) cls += ' selected';
-                if (taskDates.has(ds)) cls += ' has-task';
-                h += `<div class="${cls}" data-date="${ds}">${day}</div>`;
-            }
-            const total = firstDay+daysIn, rem = total<=35?35-total:42-total;
-            for (let day = 1; day <= rem; day++) {
-                const m = calMonth===11?0:calMonth+1, y = calMonth===11?calYear+1:calYear;
-                h += `<div class="calendar-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
-            }
-            document.getElementById('calDates').innerHTML = h;
         }
 
-        function calMove(d) { calMonth += d; if (calMonth>11) { calMonth=0; calYear++; } else if (calMonth<0) { calMonth=11; calYear--; } renderCalendar(); }
-        function calSelect(ds) { dateFilter = ds; renderTasks(); renderCalendar(); }
-        function clearFilter() { dateFilter = null; renderTasks(); renderCalendar(); }
-
-        function renderMiniCal() {
-            const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-            document.getElementById('miniCalMonth').textContent = months[miniMonth]+' '+miniYear;
-            document.getElementById('miniCalDays').innerHTML = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="mini-cal-day">${d}</div>`).join('');
-            const firstDay = new Date(miniYear,miniMonth,1).getDay(), daysIn = new Date(miniYear,miniMonth+1,0).getDate();
-            const daysPrev = new Date(miniYear,miniMonth,0).getDate(), td = today();
-            let h = '';
-            for (let i = firstDay-1; i >= 0; i--) {
-                const day = daysPrev-i, m = miniMonth===0?11:miniMonth-1, y = miniMonth===0?miniYear-1:miniYear;
-                h += `<div class="mini-cal-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
-            }
-            for (let day = 1; day <= daysIn; day++) {
-                const ds = miniYear+'-'+String(miniMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
-                let cls = 'mini-cal-date';
-                if (ds === td) cls += ' today';
-                if (miniDates.includes(ds)) cls += ' sel';
-                h += `<div class="${cls}" data-date="${ds}">${day}</div>`;
-            }
-            const total = firstDay+daysIn, rem = total<=35?35-total:42-total;
-            for (let day = 1; day <= rem; day++) {
-                const m = miniMonth===11?0:miniMonth+1, y = miniMonth===11?miniYear+1:miniYear;
-                h += `<div class="mini-cal-date other" data-date="${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}">${day}</div>`;
-            }
-            document.getElementById('miniCalDates').innerHTML = h;
-            updateMiniSel();
-        }
-
-        function updateMiniSel() {
-            const el = document.getElementById('miniCalSelected');
-            if (!miniDates.length) el.innerHTML = '📅 Nenhum dia selecionado';
-            else if (miniDates.length <= 5) el.innerHTML = miniDates.map(d => `<span class="mini-cal-tag">${fmtDate(d)} <span class="remove" data-date="${d}">✕</span></span>`).join('');
-            else el.innerHTML = `<span class="mini-cal-tag">${miniDates.length} dias selecionados</span>`;
-        }
-
-        function miniToggle(ds) {
-            const idx = miniDates.indexOf(ds);
-            if (idx > -1) miniDates.splice(idx, 1);
-            else miniDates.push(ds);
-            miniDates.sort(); renderMiniCal();
-        }
-        function miniRemove(ds) { miniDates = miniDates.filter(d => d !== ds); renderMiniCal(); }
-        function miniMove(d) { miniMonth += d; if (miniMonth>11) { miniMonth=0; miniYear++; } else if (miniMonth<0) { miniMonth=11; miniYear--; } renderMiniCal(); }
-
-        function toggleTask(id) {
-            const t = tasks.find(x => x.id === id);
-            if (t) { t.done = !t.done; save(); renderTasks(); renderCalendar(); toast(t.done?'✅ Concluída!':'🔄 Reaberta'); }
-        }
-        function deleteTask(id) {
-            const len = tasks.length; tasks = tasks.filter(x => x.id !== id);
-            if (tasks.length < len) { if (editId === id) closeModal(); save(); renderTasks(); renderCalendar(); toast('🗑️ Removida'); }
-        }
-        function clearDone() {
-            if (!dateFilter) { toast('ℹ️ Selecione uma data primeiro'); return; }
-            const ids = filtered().filter(t => t.done).map(t => t.id);
-            if (!ids.length) { toast('ℹ️ Nada para limpar'); return; }
-            tasks = tasks.filter(t => !ids.includes(t.id));
-            save(); renderTasks(); renderCalendar(); toast(`🧹 ${ids.length} removida(s)`);
-        }
-
-        function openModal(id) {
-            const input = document.getElementById('inputName');
-            if (id) {
-                const t = tasks.find(x => x.id === id); if (!t) return;
-                editId = id;
-                document.getElementById('modalTitle').textContent = 'Editar Atividade';
-                document.getElementById('editBadge').style.display = 'block';
-                document.getElementById('btnSave').textContent = '💾 Atualizar';
-                input.value = t.name; miniDates = [...(t.dates||[today()])]; category = t.category;
-                alarmEnabled = t.alarm || false;
-                document.getElementById('alarmToggle').checked = alarmEnabled;
-                if (miniDates.length) { const [y,m] = miniDates[0].split('-'); miniYear = +y; miniMonth = +m-1; }
-            } else {
-                editId = null;
-                document.getElementById('modalTitle').textContent = 'Nova Atividade';
-                document.getElementById('editBadge').style.display = 'none';
-                document.getElementById('btnSave').textContent = '💾 Salvar';
-                input.value = ''; miniDates = dateFilter?[dateFilter]:[today()]; category = 'trabalho';
-                alarmEnabled = false;
-                document.getElementById('alarmToggle').checked = false;
-                const [y,m] = miniDates[0].split('-'); miniYear = +y; miniMonth = +m-1;
-            }
-            updateChips(); renderMiniCal();
-            document.getElementById('modalOverlay').classList.add('open');
-            setTimeout(() => input.focus(), 400);
-        }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editId = null; miniDates = []; }
-        function setCategory(cat) { category = cat; updateChips(); }
-        function updateChips() {
-            document.querySelectorAll('.chip').forEach(c => {
-                c.classList.remove('active');
-                if (c.dataset.cat === category) c.classList.add('active');
-            });
-        }
-        function saveTask() {
-            const input = document.getElementById('inputName'), name = input.value.trim();
-            if (!name) { toast('⚠️ Digite o nome'); input.focus(); return; }
-            if (!miniDates.length) { toast('⚠️ Selecione pelo menos um dia'); return; }
-            alarmEnabled = document.getElementById('alarmToggle').checked;
-            if (editId) {
-                const t = tasks.find(x => x.id === editId);
-                if (t) { t.name = name; t.dates = [...miniDates]; t.category = category; t.alarm = alarmEnabled; }
-                toast('✅ Atualizada!');
-            } else {
-                tasks.push({ id: uid(), name, dates: [...miniDates], category, done: false, alarm: alarmEnabled, created: Date.now() });
-                toast('✅ Adicionada!');
-            }
-            save();
-            if (dateFilter && !miniDates.includes(dateFilter)) { dateFilter = miniDates[0]; const [y,m] = miniDates[0].split('-'); calYear = +y; calMonth = +m-1; }
-            renderTasks(); renderCalendar(); closeModal();
-        }
-
+        // ==================== TOAST ====================
         let toastTimer;
+
         function toast(msg) {
-            const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-            clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
         }
 
+        // ==================== RELÓGIO ====================
         function updateClock() {
             const n = new Date();
-            document.getElementById('clockTime').textContent = String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
-            document.getElementById('clockSec').textContent = String(n.getSeconds()).padStart(2,'0');
-        }
-        function updateHeader() {
-            document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+            document.getElementById('clockTime').textContent =
+                String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+            document.getElementById('clockSec').textContent = String(n.getSeconds()).padStart(2, '0');
         }
 
-        function bind() {
+        function updateHeader() {
+            document.getElementById('headerDate').textContent =
+                new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+        }
+
+        // ==================== EVENTOS ====================
+        function bindEvents() {
+            // Task list
             document.getElementById('taskList').addEventListener('click', function(e) {
-                const btn = e.target.closest('[data-act]'); if (!btn) return;
+                const btn = e.target.closest('[data-act]');
+                if (!btn) return;
                 e.stopPropagation();
-                const act = btn.dataset.act, id = btn.dataset.id;
+                const act = btn.dataset.act;
+                const id = btn.dataset.id;
                 if (act === 'toggle') toggleTask(id);
                 else if (act === 'edit') openModal(id);
                 else if (act === 'delete') deleteTask(id);
             });
-            document.getElementById('calDates').addEventListener('click', function(e) {
-                const d = e.target.closest('.calendar-date'); if (!d) return; calSelect(d.dataset.date);
-            });
-            document.getElementById('calPrev').addEventListener('click', function(e) { e.preventDefault(); calMove(-1); });
-            document.getElementById('calNext').addEventListener('click', function(e) { e.preventDefault(); calMove(1); });
-            document.getElementById('clearFilterBtn').addEventListener('click', function(e) { e.preventDefault(); clearFilter(); });
 
-            // Alerta de hoje
+            // Calendar
+            document.getElementById('calDates').addEventListener('click', function(e) {
+                const d = e.target.closest('.calendar-date');
+                if (!d) return;
+                calSelect(d.dataset.date);
+            });
+            document.getElementById('calPrev').addEventListener('click', function(e) { e.preventDefault();
+                calMove(-1); });
+            document.getElementById('calNext').addEventListener('click', function(e) { e.preventDefault();
+                calMove(1); });
+            document.getElementById('clearFilterBtn').addEventListener('click', function(e) { e.preventDefault();
+                clearFilter(); });
+
+            // Today alert
             document.getElementById('todayAlert').addEventListener('click', function(e) {
                 if (e.target.closest('.today-alert-btn')) return;
-                dateFilter = today(); renderTasks(); renderCalendar();
+                dateFilter = today();
+                renderTasks();
+                renderCalendar();
             });
             document.getElementById('todayAlertBtn').addEventListener('click', function(e) {
-                e.stopPropagation(); openAlarmModal();
+                e.stopPropagation();
+                openAlarmModal();
             });
 
-            // Modal de alarme
+            // Mini calendar
+            document.getElementById('miniCalDates').addEventListener('click', function(e) {
+                const d = e.target.closest('.mini-cal-date');
+                if (!d) return;
+                e.stopPropagation();
+                miniToggle(d.dataset.date);
+            });
+            document.getElementById('miniCalSelected').addEventListener('click', function(e) {
+                const r = e.target.closest('.remove');
+                if (!r) return;
+                e.stopPropagation();
+                miniRemove(r.dataset.date);
+            });
+            document.getElementById('miniCalPrev').addEventListener('click', function(e) { e.preventDefault();
+                e.stopPropagation();
+                miniMove(-1); });
+            document.getElementById('miniCalNext').addEventListener('click', function(e) { e.preventDefault();
+                e.stopPropagation();
+                miniMove(1); });
+
+            // Chips
+            document.getElementById('chips').addEventListener('click', function(e) {
+                const c = e.target.closest('.chip');
+                if (!c) return;
+                setCategory(c.dataset.cat);
+            });
+
+            // FAB
+            document.getElementById('fab').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('modalOverlay').classList.contains('open') ? closeModal() : openModal();
+            });
+
+            // Modal
+            document.getElementById('modalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+            document.getElementById('modalSheet').addEventListener('click', function(e) { e.stopPropagation(); });
+            document.getElementById('btnCancel').addEventListener('click', function(e) { e.preventDefault();
+                closeModal(); });
+            document.getElementById('btnSave').addEventListener('click', function(e) { e.preventDefault();
+                saveTask(); });
+
+            // Clear done
+            document.getElementById('clearDone').addEventListener('click', function(e) { e.preventDefault();
+                clearDone(); });
+
+            // Alarm modal
             document.getElementById('alarmDismiss').addEventListener('click', function() { dismissAlarm(); });
             document.getElementById('alarmModal').addEventListener('click', function(e) {
                 if (e.target === this) dismissAlarm();
             });
 
-            document.getElementById('miniCalDates').addEventListener('click', function(e) {
-                const d = e.target.closest('.mini-cal-date'); if (!d) return; e.stopPropagation(); miniToggle(d.dataset.date);
-            });
-            document.getElementById('miniCalSelected').addEventListener('click', function(e) {
-                const r = e.target.closest('.remove'); if (!r) return; e.stopPropagation(); miniRemove(r.dataset.date);
-            });
-            document.getElementById('miniCalPrev').addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); miniMove(-1); });
-            document.getElementById('miniCalNext').addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); miniMove(1); });
-
-            document.getElementById('chips').addEventListener('click', function(e) {
-                const c = e.target.closest('.chip'); if (!c) return; setCategory(c.dataset.cat);
-            });
-            document.getElementById('fab').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('modalOverlay').classList.contains('open') ? closeModal() : openModal();
-            });
-            document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-            document.getElementById('modalSheet').addEventListener('click', function(e) { e.stopPropagation(); });
-            document.getElementById('btnCancel').addEventListener('click', function(e) { e.preventDefault(); closeModal(); });
-            document.getElementById('btnSave').addEventListener('click', function(e) { e.preventDefault(); saveTask(); });
-            document.getElementById('clearDone').addEventListener('click', function(e) { e.preventDefault(); clearDone(); });
+            // Keyboard
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     if (document.getElementById('alarmModal').classList.contains('open')) dismissAlarm();
                     else if (document.getElementById('modalOverlay').classList.contains('open')) closeModal();
                 }
             });
+
+            // Salvar antes de sair
+            window.addEventListener('beforeunload', function() {
+                saveTasks();
+                saveAlarmsTriggered();
+            });
+
+            // Salvar quando a página ficar oculta
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    saveTasks();
+                    saveAlarmsTriggered();
+                }
+            });
         }
 
+        // ==================== INICIALIZAÇÃO ====================
         function init() {
-            load();
+            console.log('🚀 Iniciando Agenda do Allan...');
+
+            loadTasks();
+            loadAlarmsTriggered();
             renderTasks();
             renderCalendar();
             updateHeader();
             updateClock();
             updateChips();
             updateTodayAlert();
-            bind();
+            bindEvents();
+
+            // Intervalos
             setInterval(updateClock, 1000);
-            setInterval(save, 15000);
-            // Verificar alarmes a cada minuto
-            setInterval(() => {
-                const td = today();
-                const alarmTasks = tasks.filter(t => t.dates && t.dates.includes(td) && !t.done && t.alarm);
-                if (alarmTasks.length > 0 && !alarmsTriggered[td]) {
-                    triggerAlarmModal(alarmTasks, td);
-                    alarmsTriggered[td] = true;
-                    saveAlarms();
-                    updateTodayAlert();
-                }
-            }, 60000);
-            window.addEventListener('beforeunload', save);
+            setInterval(saveTasks, 30000); // Salvar a cada 30 segundos
+            setInterval(checkAlarms, 60000); // Verificar alarmes a cada minuto
+
             // Solicitar permissão de notificação
             if ('Notification' in window && Notification.permission === 'default') {
                 setTimeout(() => Notification.requestPermission(), 3000);
             }
+
+            console.log('✅ Agenda do Allan pronta!');
+            console.log('💾 Chave de armazenamento: ' + STORAGE_KEY);
+            console.log('📂 Total de tarefas: ' + tasks.length);
         }
+
         init();
     </script>
 </body>
