@@ -1,751 +1,1537 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciador de Cobranças Parceladas Inteligente</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>PMGO - Registro de Ocorrências</title>
+  
+  <!-- CONFIGURAÇÕES PARA ADICIONAR À TELA INICIAL COM O ÍCONE DO BRASÃO -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#0a1628">
+  <meta name="apple-mobile-web-app-title" content="PMGO">
+  
+  <!-- Ícone para iPhone / iOS -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='240' fill='%230b3b2f' stroke='%23d4af37' stroke-width='14'/%3E%3Ccircle cx='256' cy='256' r='210' fill='none' stroke='%23d4af37' stroke-width='4'/%3E%3Ctext x='256' y='180' text-anchor='middle' fill='%23d4af37' font-size='48' font-weight='bold' font-family='serif'%3EPOLÍCIA%3C/text%3E%3Ctext x='256' y='240' text-anchor='middle' fill='%23d4af37' font-size='42' font-weight='bold' font-family='serif'%3EMILITAR%3C/text%3E%3Cpath d='M160 280 L256 340 L352 280' fill='none' stroke='%23d4af37' stroke-width='12' stroke-linecap='round'/%3E%3Ctext x='256' y='320' text-anchor='middle' fill='%23ffffff' font-size='30' font-weight='bold' font-family='serif'%3EGOIÁS%3C/text%3E%3Ccircle cx='256' cy='370' r='28' fill='%23d4af37'/%3E%3Ctext x='256' y='380' text-anchor='middle' fill='%230b3b2f' font-size='24' font-weight='bold'%3EPM%3C/text%3E%3Cpath d='M200 410 L256 460 L312 410' fill='none' stroke='%23d4af37' stroke-width='8'/%3E%3C/svg%3E">
+  
+  <!-- Ícone de Favoritos/Android Geral -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='240' fill='%230b3b2f' stroke='%23d4af37' stroke-width='14'/%3E%3Ccircle cx='256' cy='256' r='210' fill='none' stroke='%23d4af37' stroke-width='4'/%3E%3Ctext x='256' y='180' text-anchor='middle' fill='%23d4af37' font-size='48' font-weight='bold' font-family='serif'%3EPOLÍCIA%3C/text%3E%3Ctext x='256' y='240' text-anchor='middle' fill='%23d4af37' font-size='42' font-weight='bold' font-family='serif'%3EMILITAR%3C/text%3E%3Cpath d='M160 280 L256 340 L352 280' fill='none' stroke='%23d4af37' stroke-width='12' stroke-linecap='round'/%3E%3Ctext x='256' y='320' text-anchor='middle' fill='%23ffffff' font-size='30' font-weight='bold' font-family='serif'%3EGOIÁS%3C/text%3E%3Ccircle cx='256' cy='370' r='28' fill='%23d4af37'/%3E%3Ctext x='256' y='380' text-anchor='middle' fill='%230b3b2f' font-size='24' font-weight='bold'%3EPM%3C/text%3E%3Cpath d='M200 410 L256 460 L312 410' fill='none' stroke='%23d4af37' stroke-width='8'/%3E%3C/svg%3E">
 
-        body {
-            background-color: #f0f3f5;
-            color: #2c3e50;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+  <!-- Manifesto Android WebApp integrado para forçar o ícone corporativo -->
+  <link rel="manifest" href="data:application/json,{%22name%22:%22Registro%20de%20Ocorrências%20PMGO%22,%22short_name%22:%22PMGO%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a1628%22,%22theme_color%22:%22%230a1628%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%3E%3Ccircle%20cx='256'%20cy='256'%20r='240'%20fill='%230b3b2f'%20stroke='%23d4af37'%20stroke-width='14'/%3E%3Ccircle%20cx='256'%20cy='256'%20r='210'%20fill='none'%20stroke='%23d4af37'%20stroke-width='4'/%3E%3Ctext%20x='256'%20y='180'%20text-anchor='middle'%20fill='%23d4af37'%20font-size='48'%20font-weight='bold'%20font-family='serif'%3EPOLÍCIA%3C/text%3E%3Ctext%20x='256'%20y='240'%20text-anchor='middle'%20fill='%23d4af37'%20font-size='42'%20font-weight='bold'%20font-family='serif'%3EMILITAR%3C/text%3E%3Cpath%20d='M160%20280%20L256%20340%20L352%20280'%20fill='none'%20stroke='%23d4af37'%20stroke-width='12'%20stroke-linecap='round'/%3E%3Ctext%20x='256'%20y='320'%20text-anchor='middle'%20fill='%23ffffff'%20font-size='30'%20font-weight='bold'%20font-family='serif'%3EGOIÁS%3C/text%3E%3Ccircle%20cx='256'%20cy='370'%20r='28'%20fill='%23d4af37'/%3E%3Ctext%20x='256'%20y='380'%20text-anchor='middle'%20fill='%230b3b2f'%20font-size='24'%20font-weight='bold'%3EPM%3C/text%3E%3Cpath%20d='M200%20410%20L256%20460%20L312%20410'%20fill='none'%20stroke='%23d4af37'%20stroke-width='8'/%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]}">
 
-        .container {
-            width: 100%;
-            max-width: 650px;
-        }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        header {
-            margin-bottom: 25px;
-            text-align: center;
-        }
+    body {
+      background: #0a1628;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      margin: 0;
+      background-image: 
+        radial-gradient(ellipse at 30% 0%, #1a3442 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 100%, #0f2b21 0%, transparent 50%),
+        linear-gradient(180deg, #0a1628 0%, #061220 100%);
+      position: relative;
+    }
 
-        header h1 {
-            font-size: 2.2rem;
-            color: #1a252f;
-        }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 350px;
+      height: 350px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='240' fill='none' stroke='%23d4af37' stroke-width='6' opacity='0.08'/%3E%3Ccircle cx='256' cy='256' r='210' fill='none' stroke='%23d4af37' stroke-width='2' opacity='0.06'/%3E%3Ctext x='256' y='170' text-anchor='middle' fill='%23d4af37' font-size='42' font-weight='bold' font-family='serif' opacity='0.08'%3EPOLÍCIA%3C/text%3E%3Ctext x='256' y='225' text-anchor='middle' fill='%23d4af37' font-size='36' font-weight='bold' font-family='serif' opacity='0.08'%3EMILITAR%3C/text%3E%3Cpath d='M160 270 L256 330 L352 270' fill='none' stroke='%23d4af37' stroke-width='8' opacity='0.07'/%3E%3Ctext x='256' y='310' text-anchor='middle' fill='%23ffffff' font-size='28' font-weight='bold' font-family='serif' opacity='0.07'%3EGOIÁS%3C/text%3E%3Ccircle cx='256' cy='365' r='30' fill='none' stroke='%23d4af37' stroke-width='5' opacity='0.07'/%3E%3Ctext x='256' y='376' text-anchor='middle' fill='%23d4af37' font-size='22' font-weight='bold' opacity='0.08'%3EPM%3C/text%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        /* Área de Digitação */
-        .input-area {
-            background: #fff;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            position: relative;
-        }
+    .app-container {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(15, 28, 47, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 1.8rem;
+      padding: 1.5rem 1.5rem 1.8rem;
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 0 40px rgba(212, 175, 55, 0.05);
+      color: #eef5ff;
+      position: relative;
+      z-index: 1;
+    }
 
-        .row-inputs {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
+    .top-bar {
+      height: 3px;
+      background: linear-gradient(90deg, #d4af37, #f5e6a3, #d4af37);
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+      opacity: 0.8;
+    }
 
-        .input-titulo, .input-valor, .input-parcelas {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1.05rem;
-            font-weight: bold;
-            outline: none;
-            transition: all 0.3s;
-        }
+    .pm-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 0 0.2rem;
+    }
 
-        .input-valor, .input-parcelas {
-            text-align: center;
-        }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
 
-        .input-titulo:focus, .input-valor:focus, .input-parcelas:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
+    .brasao-svg-container {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f8f4e6, #e8dcc8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 4px 15px rgba(0,0,0,0.6),
+        0 0 0 2px #d4af37,
+        inset 0 1px 3px rgba(255,255,255,0.5);
+      border: 2px solid #0a1628;
+      padding: 4px;
+    }
 
-        textarea {
-            width: 100%;
-            height: 110px;
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            resize: vertical;
-            font-size: 1.05rem;
-            margin-bottom: 15px;
-            outline: none;
-            transition: all 0.3s;
-        }
+    .brasao-svg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
 
-        textarea:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
+    .pm-title h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: #f0e6c5;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      line-height: 1.2;
+    }
 
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 10px;
-        }
+    .pm-title .sub {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #a0b8d0;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
 
-        button {
-            border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+    .clock-wrapper {
+      background: rgba(8, 20, 40, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 2rem;
+      padding: 0.4rem 1.2rem;
+      box-shadow: 
+        0 0 15px rgba(0,160,255,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
 
-        .btn-salvar {
-            background-color: #2ecc71;
-            color: white;
-        }
+    .digital-clock {
+      font-family: 'Courier New', 'Fira Code', monospace;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #a0d8ef;
+      background: #020d1a;
+      padding: 0.2rem 0.7rem;
+      border-radius: 1rem;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px #00a6ff;
+      box-shadow: inset 0 1px 4px #001020;
+    }
 
-        .btn-salvar:hover { background-color: #27ae60; }
+    .date-badge {
+      font-size: 0.8rem;
+      color: #bccfe0;
+      font-weight: 500;
+    }
 
-        .btn-voz {
-            background-color: #34495e;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            padding: 0;
-        }
+    .form-section {
+      background: rgba(12, 24, 42, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.4rem;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      margin: 1.2rem 0;
+      box-shadow: 
+        0 8px 20px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+    }
 
-        .btn-voz.escutando {
-            background-color: #e74c3c;
-            animation: pulse 1.5s infinite;
-        }
+    .field-group {
+      margin-bottom: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
 
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-        }
+    label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #c9b057;
+      margin-left: 0.2rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
 
-        .status-voz {
-            font-size: 0.85rem;
-            color: #e74c3c;
-            text-align: center;
-            margin-bottom: 10px;
-            font-weight: 500;
-            display: none;
-        }
+    input, select, textarea {
+      background: rgba(8, 18, 33, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 1rem;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.9rem;
+      color: #eef5ff;
+      outline: none;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+      width: 100%;
+    }
 
-        /* Lista de Cobranças */
-        .notas-lista {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    input:focus, select:focus, textarea:focus {
+      border-color: #d4af37;
+      box-shadow: 
+        0 0 14px rgba(212, 175, 55, 0.25),
+        inset 0 1px 4px rgba(0,0,0,0.5);
+      background: rgba(10, 22, 40, 0.95);
+    }
 
-        .nota-card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border-left: 6px solid #e67e22; 
-            animation: surgir 0.3s ease;
-            transition: all 0.3s ease;
-        }
+    textarea {
+      resize: vertical;
+      min-height: 85px;
+    }
 
-        .nota-card.parcial { border-left-color: #f1c40f; background-color: #fefdf3;}
-        .nota-card.pago { border-left-color: #2ecc71; background-color: #f4fbf7; }
+    .row-double {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
 
-        @keyframes surgir {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    @media (max-width: 500px) {
+      .row-double {
+        grid-template-columns: 1fr;
+      }
+    }
 
-        .nota-header-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
+    .row-double .field-group {
+      margin-bottom: 0;
+    }
 
-        .nota-titulo-exibicao {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #1a252f;
-        }
+    .natureza-search-container {
+      position: relative;
+    }
 
-        /* Badges */
-        .badge-status {
-            padding: 4px 10px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            border-radius: 20px;
-            text-transform: uppercase;
-        }
+    .natureza-search-input {
+      background: rgba(8, 18, 33, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 1rem;
+      padding: 0.85rem 1.1rem;
+      font-size: 0.9rem;
+      color: #eef5ff;
+      outline: none;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+      width: 100%;
+      cursor: pointer;
+      caret-color: #d4af37;
+    }
 
-        .status-pendente { background-color: #fdebd0; color: #b7950b; }
-        .status-parcial { background-color: #fef9e7; color: #b7950b; }
-        .status-pago { background-color: #d4efdf; color: #196f3d; }
+    .natureza-search-input:focus {
+      border-color: #d4af37;
+      box-shadow: 
+        0 0 14px rgba(212, 175, 55, 0.25),
+        inset 0 1px 4px rgba(0,0,0,0.5);
+      background: rgba(10, 22, 40, 0.95);
+    }
 
-        .nota-texto {
-            font-size: 1.05rem;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
+    .natureza-search-input::placeholder {
+      color: #6a7d95;
+    }
 
-        /* Parcelas Dentro do Card */
-        .parcelas-container {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-            gap: 8px;
-            border: 1px solid #e2e8f0;
-        }
+    .natureza-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #0f1f33;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 0.8rem;
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      margin-top: 0.3rem;
+    }
 
-        .parcela-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            font-weight: 500;
-            font-size: 0.85rem;
-            height: 38px;
-        }
+    .natureza-dropdown.active {
+      display: block;
+    }
 
-        .parcela-esquerda {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-grow: 1;
-        }
+    .natureza-dropdown-item {
+      padding: 0.7rem 1.1rem;
+      cursor: pointer;
+      color: #ccdbe9;
+      font-size: 0.82rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .parcela-esquerda input[type="checkbox"] {
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-        }
+    .natureza-dropdown-item .artigo {
+      font-size: 0.7rem;
+      color: #d4af37;
+      opacity: 0.8;
+      font-weight: 500;
+    }
 
-        .parcela-texto-valor {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
+    .natureza-dropdown-item:hover {
+      background: rgba(212, 175, 55, 0.15);
+      color: #f0d878;
+    }
 
-        .btn-acao-parcela {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            padding: 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .natureza-dropdown-item.selected {
+      background: rgba(212, 175, 55, 0.25);
+      color: #f0d878;
+      font-weight: 600;
+    }
 
-        .btn-acao-parcela:hover {
-            background: #e2e8f0;
-        }
+    .natureza-dropdown-item.no-results {
+      color: #6a7d95;
+      font-style: italic;
+      cursor: pointer;
+      justify-content: center;
+    }
 
-        .input-inline-parcela {
-            width: 70px;
-            border: 2px solid #3498db;
-            border-radius: 4px;
-            padding: 2px 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            outline: none;
-            text-align: right;
-        }
+    .natureza-dropdown-item.no-results:hover {
+      background: rgba(212, 175, 55, 0.1);
+      color: #d4af37;
+    }
 
-        .nota-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: #95a5a6;
-            border-top: 1px solid #f8f9fa;
-            padding-top: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+    .natureza-dropdown::-webkit-scrollbar {
+      width: 4px;
+    }
 
-        .botoes-card {
-            display: flex;
-            gap: 5px;
-        }
+    .natureza-dropdown::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+    }
 
-        .btn-card {
-            background: none;
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            border-radius: 6px;
-            font-weight: 600;
-        }
+    .natureza-dropdown::-webkit-scrollbar-thumb {
+      background: #d4af37;
+      border-radius: 10px;
+    }
 
-        .btn-zap { color: #2ecc71; }
-        .btn-zap:hover { background: #e8f8f0; }
+    .naturezas-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+      min-height: 24px;
+    }
 
-        .btn-editar { color: #3498db; }
-        .btn-editar:hover { background: #ebf5fb; }
+    .natureza-tag {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: #f5e3a9;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.5rem;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 500;
+    }
 
-        .btn-excluir { color: #e74c3c; }
-        .btn-excluir:hover { background: #fdedec; }
+    .natureza-tag .btn-remove-tag {
+      background: none;
+      border: none;
+      color: #e74c3c;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      padding: 0 0.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .dica-comando {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            text-align: center;
-            margin-top: 8px;
-        }
-    </style>
+    .natureza-tag .btn-remove-tag:hover {
+      color: #ff6b6b;
+    }
+
+    .btn-galeria {
+      background: rgba(20, 35, 55, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: #d4af37;
+      padding: 0.6rem 1rem;
+      border-radius: 1.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      backdrop-filter: blur(4px);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-galeria:hover {
+      background: rgba(30, 50, 75, 0.9);
+      border-color: #d4af37;
+      color: #f0d878;
+      box-shadow: 0 0 10px rgba(212,175,55,0.2);
+    }
+
+    .imagens-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .imagem-item {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 0.8rem;
+      overflow: hidden;
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+
+    .imagem-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .imagem-item .btn-remover {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(192, 57, 43, 0.9);
+      color: white;
+      border: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .imagens-card {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+    }
+
+    .imagem-card-item {
+      width: 60px;
+      height: 60px;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .imagem-card-item:hover {
+      border-color: #d4af37;
+      transform: scale(1.05);
+    }
+
+    .imagem-card-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .badge-imagens {
+      background: rgba(37, 211, 102, 0.15);
+      padding: 0.15rem 0.7rem;
+      border-radius: 0.8rem;
+      font-size: 0.65rem;
+      color: #25d366;
+      font-weight: 500;
+      align-self: flex-start;
+      border: 1px solid rgba(37, 211, 102, 0.25);
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      cursor: pointer;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 95%;
+      max-height: 90vh;
+      border-radius: 1rem;
+      border: 2px solid #d4af37;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    }
+
+    .btn-registrar {
+      background: linear-gradient(180deg, #d4af37 0%, #a07818 100%);
+      color: #0a121f;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.9rem 1.8rem;
+      border-radius: 2.5rem;
+      width: 100%;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 0.8rem;
+      cursor: pointer;
+      border: 1px solid #f0d878;
+      box-shadow: 
+        0 8px 18px rgba(0,0,0,0.7),
+        0 0 15px rgba(212, 175, 55, 0.3);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+    }
+
+    .btn-registrar:hover {
+      background: linear-gradient(180deg, #e8c545 0%, #b08620 100%);
+      box-shadow: 
+        0 10px 22px rgba(0,0,0,0.8),
+        0 0 22px rgba(212, 175, 55, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-registrar:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+    }
+
+    .ocorrencias-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1.5rem 0 0.8rem;
+      padding: 0 0.2rem;
+    }
+
+    .ocorrencias-header h3 {
+      color: #e6d9a8;
+      font-weight: 600;
+      font-size: 1.05rem;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .clear-btn {
+      background: rgba(30, 40, 55, 0.6);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: #c9ae5b;
+      padding: 0.4rem 1.1rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 500;
+    }
+
+    .clear-btn:hover {
+      background: rgba(50, 40, 25, 0.8);
+      color: #ffdf80;
+      border-color: #d4af37;
+    }
+
+    .lista-container {
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 0.3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .lista-container::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .lista-container::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+    }
+
+    .lista-container::-webkit-scrollbar-thumb {
+      background: #d4af37;
+      border-radius: 10px;
+    }
+
+    .ocorrencia-card {
+      background: rgba(12, 24, 42, 0.7);
+      border-left: 4px solid #d4af37;
+      border-radius: 1rem;
+      padding: 0.9rem 1.1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .ocorrencia-card:hover {
+      background: rgba(16, 30, 50, 0.8);
+      border-left-color: #f0d878;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+    }
+
+    .btn-excluir-card {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: rgba(192, 57, 43, 0.7);
+      color: white;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+
+    .btn-excluir-card:hover {
+      background: rgba(231, 76, 60, 0.95);
+      transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #f5e3a9;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      padding-right: 30px;
+    }
+
+    .card-details {
+      color: #bccfe0;
+      font-size: 0.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .badge-natureza {
+      background: linear-gradient(135deg, #b4942c, #8b6914);
+      padding: 0.2rem 0.9rem;
+      border-radius: 1rem;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      color: #ffffff;
+      font-weight: 700;
+      align-self: flex-start;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .badge-artigo {
+      background: rgba(212, 175, 55, 0.15);
+      padding: 0.15rem 0.7rem;
+      border-radius: 0.8rem;
+      font-size: 0.65rem;
+      color: #d4af37;
+      font-weight: 500;
+      align-self: flex-start;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-editar, .btn-whatsapp {
+      background: rgba(20, 35, 55, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: #d4af37;
+      padding: 0.35rem 0.9rem;
+      border-radius: 1.5rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-editar:hover {
+      background: rgba(30, 50, 75, 0.9);
+      border-color: #d4af37;
+      color: #f0d878;
+      box-shadow: 0 0 10px rgba(212,175,55,0.2);
+    }
+
+    .btn-whatsapp {
+      background: rgba(7, 94, 84, 0.7);
+      border-color: #25d366;
+      color: #ffffff;
+    }
+
+    .btn-whatsapp:hover {
+      background: rgba(18, 140, 126, 0.85);
+      border-color: #25d366;
+      box-shadow: 0 0 12px rgba(37, 211, 102, 0.35);
+    }
+
+    .empty-message {
+      text-align: center;
+      color: #6a7d95;
+      padding: 2rem;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    .footer-note {
+      margin-top: 1.2rem;
+      font-size: 0.68rem;
+      color: #556b82;
+      text-align: center;
+      border-top: 1px solid rgba(212, 175, 55, 0.15);
+      padding-top: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(180deg, #0f1f33, #09182a);
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+    }
+
+    .modal-content h3 {
+      color: #d4af37;
+      margin-bottom: 1.2rem;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+    }
+
+    .btn-salvar-edicao {
+      background: linear-gradient(180deg, #d4af37, #9e7d1e);
+      color: #0a121f;
+      font-weight: 700;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      border: 1px solid #f0d878;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn-cancelar {
+      background: rgba(40, 50, 65, 0.8);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .btn-salvar-edicao:hover {
+      background: linear-gradient(180deg, #e8c545, #b08620);
+    }
+
+    .btn-cancelar:hover {
+      background: rgba(55, 65, 80, 0.9);
+    }
+
+    .info-text {
+      font-size: 0.7rem;
+      color: #d4af37;
+      margin-top: 0.2rem;
+      opacity: 0.7;
+    }
+  </style>
 </head>
 <body>
+  <div class="app-container">
+    <div class="top-bar"></div>
 
-    <div class="container">
-        <header>
-            <h1>📝 Cobranças Inteligentes</h1>
-        </header>
-
-        <div class="input-area">
-            <div id="statusVoz" class="status-voz">🎙️ Ouvindo... Fale agora.</div>
-            
-            <div class="row-inputs">
-                <input type="text" id="notaTitulo" class="input-titulo" placeholder="Cliente ou Serviço...">
-                <input type="number" id="notaValor" class="input-valor" min="0" step="0.01" placeholder="Valor R$" oninput="calcularParcelasAutomatico()">
-                <input type="number" id="notaParcelas" class="input-parcelas" min="1" value="1" placeholder="Parc." oninput="calcularParcelasAutomatico()">
-            </div>
-            
-            <textarea id="notaTexto" placeholder="Os detalhes do parcelamento aparecerão aqui automaticamente conforme você digita o valor..."></textarea>
-            
-            <div class="action-buttons">
-                <button onclick="salvarNota()" class="btn-salvar" id="btnSalvarPrincipal">💾 Registrar Cobrança</button>
-                <button onclick="alternarVoz()" class="btn-voz" id="btnVoz" title="Ativar Voz">🎙️</button>
-            </div>
-            <div class="dica-comando">Dica de voz: fale <b>"salvar anotação"</b> ou <b>"limpar tudo"</b>.</div>
+    <div class="pm-header">
+      <div class="logo-area">
+        <div class="brasao-svg-container">
+          <svg class="brasao-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="256" cy="256" r="240" fill="#0b3b2f" stroke="#d4af37" stroke-width="14"/>
+            <circle cx="256" cy="256" r="210" fill="none" stroke="#d4af37" stroke-width="4"/>
+            <text x="256" y="180" text-anchor="middle" fill="#d4af37" font-size="48" font-weight="bold" font-family="serif">POLÍCIA</text>
+            <text x="256" y="240" text-anchor="middle" fill="#d4af37" font-size="42" font-weight="bold" font-family="serif">MILITAR</text>
+            <path d="M160 280 L256 340 L352 280" fill="none" stroke="#d4af37" stroke-width="12" stroke-linecap="round"/>
+            <text x="256" y="320" text-anchor="middle" fill="#ffffff" font-size="30" font-weight="bold" font-family="serif">GOIÁS</text>
+            <circle cx="256" cy="370" r="28" fill="#d4af37"/>
+            <text x="256" y="380" text-anchor="middle" fill="#0b3b2f" font-size="24" font-weight="bold">PM</text>
+            <path d="M200 410 L256 460 L312 410" fill="none" stroke="#d4af37" stroke-width="8"/>
+          </svg>
         </div>
-
-        <div id="notasContainer" class="notas-lista"></div>
+        <div class="pm-title">
+          <h2>PMGO</h2>
+          <div class="sub">Polícia Militar de Goiás</div>
+        </div>
+      </div>
+      <div class="clock-wrapper">
+        <span id="dataHoje" class="date-badge"></span>
+        <span id="relogioDigital" class="digital-clock">--:--</span>
+      </div>
     </div>
 
-    <script>
-        // --- FUNÇÃO DE CÁLCULO AUTOMÁTICO ---
-        function calcularParcelasAutomatico() {
-            if (idEdicaoAtual !== null && document.activeElement.id === "notaTexto") return;
+    <div class="form-section">
+      <div class="field-group">
+        <label>📋 Número da Ocorrência / BO</label>
+        <input type="text" id="numeroBO" placeholder="Ex: PMGO-2026-01542">
+      </div>
+      <div class="row-double">
+        <div class="field-group">
+          <label>📅 Data do fato</label>
+          <input type="date" id="dataFato">
+        </div>
+        <div class="field-group">
+          <label>⏰ Hora aproximada</label>
+          <input type="time" id="horaFato">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>📍 Endereço / Local</label>
+        <input type="text" id="localOcorrencia" placeholder="Av. Goiás, Setor Central, Goiânia - GO">
+      </div>
+      <div class="row-double">
+        <div class="field-group">
+          <label>⚖️ Natureza da Ocorrência (Múltiplas)</label>
+          <div class="natureza-search-container" id="naturezaContainer">
+            <input 
+              type="text" 
+              class="natureza-search-input" 
+              id="naturezaSearch" 
+              placeholder="🔍 Busque ou digite e pressione Enter..."
+              autocomplete="off"
+            >
+            <div class="natureza-dropdown" id="naturezaDropdown"></div>
+          </div>
+          <div class="naturezas-tags-container" id="naturezasTagsContainer"></div>
+          <div class="info-text">💡 Selecione na lista ou digite algo novo e aperte Enter para incluir na lista de acusações.</div>
+        </div>
+        <div class="field-group">
+          <label>👤 Envolvidos (quantidade)</label>
+          <input type="number" id="envolvidos" placeholder="Nº" min="0" value="1">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>📝 Descrição do fato</label>
+        <textarea id="descricao" placeholder="Descreva a ocorrência de forma objetiva e detalhada..."></textarea>
+      </div>
+      
+      <div class="field-group">
+        <label>🖼️ Imagens da Ocorrência</label>
+        <button type="button" class="btn-galeria" id="btnGaleria">
+          📁 Escolher imagens da galeria
+        </button>
+        <input type="file" id="inputGaleria" accept="image/*" multiple style="display:none;">
+        <div class="imagens-preview" id="imagensPreview"></div>
+        <div class="info-text">💡 Toque nas miniaturas para ampliar</div>
+      </div>
+      
+      <button class="btn-registrar" id="btnRegistrar">
+        📌 REGISTRAR OCORRÊNCIA
+      </button>
+    </div>
 
-            const valorTotal = parseFloat(document.getElementById("notaValor").value) || 0;
-            const qtdParcelas = parseInt(document.getElementById("notaParcelas").value) || 1;
-            const campoTexto = document.getElementById("notaTexto");
+    <div class="ocorrencias-header">
+      <h3>📂 Últimos Registros</h3>
+      <button class="clear-btn" id="btnLimparTudo">🗑 Limpar todos</button>
+    </div>
+    <div id="listaOcorrencias" class="lista-container">
+      <div class="empty-message">Nenhuma ocorrência registrada ainda.</div>
+    </div>
+    <div class="footer-note">
+      Polícia Militar do Estado de Goiás • Dados armazenados com segurança localmente
+    </div>
+  </div>
 
-            if (valorTotal <= 0) {
-                campoTexto.value = "";
-                return;
+  <div class="lightbox" id="lightbox">
+    <img src="" alt="Imagem da ocorrência" id="lightboxImg">
+  </div>
+
+  <div class="modal-overlay" id="modalEdicao">
+    <div class="modal-content">
+      <h3>✏️ Editar Ocorrência</h3>
+      <div class="field-group">
+        <label>Nº BO</label>
+        <input type="text" id="editNumeroBO">
+      </div>
+      <div class="row-double">
+        <div class="field-group">
+          <label>Data</label>
+          <input type="date" id="editData">
+        </div>
+        <div class="field-group">
+          <label>Hora</label>
+          <input type="time" id="editHora">
+        </div>
+      </div>
+      <div class="field-group">
+        <label>Local</label>
+        <input type="text" id="editLocal">
+      </div>
+      <div class="field-group">
+        <label>Naturezas / Acusações</label>
+        <div class="natureza-search-container" id="editNaturezaContainer">
+          <input 
+            type="text" 
+            class="natureza-search-input" 
+            id="editNaturezaSearch" 
+            placeholder="🔍 Adicione mais naturezas..."
+            autocomplete="off"
+          >
+          <div class="natureza-dropdown" id="editNaturezaDropdown"></div>
+        </div>
+        <div class="naturezas-tags-container" id="editNaturezasTagsContainer"></div>
+      </div>
+      <div class="field-group">
+        <label>Envolvidos</label>
+        <input type="number" id="editEnvolvidos" min="0">
+      </div>
+      <div class="field-group">
+        <label>Descrição</label>
+        <textarea id="editDescricao"></textarea>
+      </div>
+      <div class="field-group">
+        <label>🖼️ Imagens</label>
+        <button type="button" class="btn-galeria" id="btnEditGaleria">
+          📁 Escolher imagens da galeria
+        </button>
+        <input type="file" id="editInputGaleria" accept="image/*" multiple style="display:none;">
+        <div class="imagens-preview" id="editImagensPreview"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-salvar-edicao" id="btnSalvarEdicao">💾 Salvar</button>
+        <button class="btn-cancelar" id="btnCancelarEdicao">❌ Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const STORAGE_KEY = 'pmgo_ocorrencias_app';
+      let ocorrenciaEditandoId = null;
+      let imagensTemporarias = [];
+      let editImagensTemporarias = [];
+      
+      let naturezasSelecionadasForm = [];
+      let editNaturezasSelecionadasForm = [];
+
+      const naturezasComArtigos = [
+        { natureza: 'Acidente de Trânsito com Vítima', artigo: 'Art. 303 CTB' },
+        { natureza: 'Acidente de Trânsito sem Vítima', artigo: 'Art. 304 CTB' },
+        { natureza: 'Ameaça', artigo: 'Art. 147 CP' },
+        { natureza: 'Apoio a Outros Órgãos', artigo: 'Apoio Institucional' },
+        { natureza: 'Apropriação Indébita', artigo: 'Art. 168 CP' },
+        { natureza: 'Associação para o Tráfico', artigo: 'Art. 35 Lei 11.343/06' },
+        { natureza: 'Ato Infracional (Menor Infrator)', artigo: 'Art. 103 ECA' },
+        { natureza: 'Calúnia', artigo: 'Art. 138 CP' },
+        { natureza: 'Comércio Ilegal de Armas', artigo: 'Art. 17 Lei 10.826/03' },
+        { geometry: 'Constrangimento Ilegal', natureza: 'Constrangimento Ilegal', artigo: 'Art. 146 CP' },
+        { natureza: 'Corrupção Ativa', artigo: 'Art. 333 CP' },
+        { natureza: 'Crime Ambiental', artigo: 'Art. 38 Lei 9.605/98' },
+        { natureza: 'Cultivo de Plantas Entorpecentes', artigo: 'Art. 28 Lei 11.343/06' },
+        { natureza: 'Dano ao Patrimônio', artigo: 'Art. 163 CP' },
+        { natureza: 'Dano ao Patrimônio Público', artigo: 'Art. 163, III CP' },
+        { natureza: 'Desacato', artigo: 'Art. 331 CP' },
+        { natureza: 'Desaparecimento de Pessoa', artigo: 'Arts. 83 e 84 ECA' },
+        { natureza: 'Desmatamento', artigo: 'Art. 50 Lei 9.605/98' },
+        { natureza: 'Desobediência', artigo: 'Art. 330 CP' },
+        { natureza: 'Difamação', artigo: 'Art. 139 CP' },
+        { natureza: 'Direção Perigosa', artigo: 'Art. 308 CTB' },
+        { natureza: 'Disparo de Arma de Fogo', artigo: 'Art. 15 Lei 10.826/03' },
+        { natureza: 'Embriaguez ao Volante', artigo: 'Art. 306 CTB' },
+        { natureza: 'Encontro de Pessoa Desaparecida', artigo: 'Localização' },
+        { natureza: 'Estelionato', artigo: 'Art. 171 CP' },
+        { natureza: 'Falsidade Ideológica', artigo: 'Art. 299 CP' },
+        { natureza: 'Feminicídio', artigo: 'Art. 121, VI CP' },
+        { natureza: 'Fuga do Local de Acidente', artigo: 'Art. 305 CTB' },
+        { natureza: 'Furto Qualificado', artigo: 'Art. 155 CP' },
+        { natureza: 'Furto Simples', artigo: 'Art. 155 CP' },
+        { natureza: 'Homicídio Culposo', artigo: 'Art. 121 CP' },
+        { natureza: 'Homicídio Doloso', artigo: 'Art. 121 CP' },
+        { natureza: 'Injúria', artigo: 'Art. 140 CP' },
+        { natureza: 'Invasão de Propriedade', artigo: 'Art. 150 CP' },
+        { natureza: 'Latrocínio (Roubo Seguido de Morte)', artigo: 'Art. 157 CP' },
+        { natureza: 'Lesão Corporal', artigo: 'Art. 129 CP' },
+        { natureza: 'Lesão Corporal Grave', artigo: 'Art. 129 CP' },
+        { natureza: 'Lesão Corporal Seguida de Morte', artigo: 'Art. 129 CP' },
+        { natureza: 'Maus-tratos a Animais', artigo: 'Art. 32 Lei 9.605/98' },
+        { natureza: 'Ocorrência Policial Militar', artigo: 'Regulamento PM' },
+        { natureza: 'Perturbação da Ordem', artigo: 'Art. 42 LCP' },
+        { natureza: 'Perturbação do Sossego', artigo: 'Art. 42 LCP' },
+        { natureza: 'Porte de Drogas para Consumo', artigo: 'Art. 28 Lei 11.343/06' },
+        { natureza: 'Porte Ilegal de Arma de Fogo', artigo: 'Art. 14 Lei 10.826/03' },
+        { natureza: 'Posse de Drogas', artigo: 'Art. 28 Lei 11.343/06' },
+        { natureza: 'Posse Irregular de Arma', artigo: 'Art. 12 Lei 10.826/03' },
+        { natureza: 'Queimada Ilegal', artigo: 'Art. 41 Lei 9.605/98' },
+        { natureza: 'Receptação', artigo: 'Art. 180 CP' },
+        { natureza: 'Resistência', artigo: 'Art. 329 CP' },
+        { natureza: 'Roubo / 157', artigo: 'Art. 157 CP' },
+        { natureza: 'Roubo com Arma de Fogo', artigo: 'Art. 157 CP' },
+        { natureza: 'Sequestro e Cárcere Privado', artigo: 'Art. 148 CP' },
+        { natureza: 'Tentativa de Homicídio', artigo: 'Art. 121 CP' },
+        { natureza: 'Tráfico de Drogas', artigo: 'Art. 33 Lei 11.343/06' },
+        { natureza: 'Vias de Fato', artigo: 'Art. 21 LCP' },
+        { natureza: 'Violência Doméstica (Maria da Penha)', artigo: 'Art. 7 Lei 11.340/06' }
+      ];
+
+      function atualizarRelogio() {
+        const agora = new Date();
+        document.getElementById('relogioDigital').textContent = 
+          `${String(agora.getHours()).padStart(2,'0')}:${String(agora.getMinutes()).padStart(2,'0')}:${String(agora.getSeconds()).padStart(2,'0')}`;
+        document.getElementById('dataHoje').textContent = 
+          agora.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(',', '');
+      }
+      atualizarRelogio();
+      setInterval(atualizarRelogio, 1000);
+
+      const carregar = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } };
+      const salvar = (lista) => localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+
+      function comprimirImagem(file, maxWidth = 800, qualidade = 0.7) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+              const canvas = document.createElement('canvas');
+              let width = img.width;
+              let height = img.height;
+              if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', qualidade));
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function renderizarPreview(containerId, imagensArray, removerCallback) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = imagensArray.map((img, index) => `
+          <div class="imagem-item">
+            <img src="${img}" alt="Imagem ${index + 1}" onclick="abrirLightbox('${img}')">
+            <button class="btn-remover" data-index="${index}">×</button>
+          </div>
+        `).join('');
+        
+        container.querySelectorAll('.btn-remover').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const index = parseInt(this.getAttribute('data-index'));
+            removerCallback(index);
+          });
+        });
+      }
+
+      function abrirLightbox(src) {
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightbox').classList.add('active');
+      }
+
+      document.getElementById('lightbox').addEventListener('click', function() {
+        this.classList.remove('active');
+      });
+
+      window.abrirLightbox = abrirLightbox;
+
+      function configurarGaleria(btnGaleriaId, inputId, previewContainerId, getArrayRef, updateCallback) {
+        document.getElementById(btnGaleriaId).addEventListener('click', function() {
+          document.getElementById(inputId).click();
+        });
+        
+        document.getElementById(inputId).addEventListener('change', async function(e) {
+          if (e.target.files.length > 0) {
+            let arr = getArrayRef();
+            for (const file of e.target.files) {
+              const dataUrl = await comprimirImagem(file);
+              arr.push(dataUrl);
             }
+            updateCallback();
+            this.value = '';
+          }
+        });
+      }
 
-            const valorParcela = (valorTotal / qtdParcelas).toFixed(2);
-            
-            if (qtdParcelas === 1) {
-                campoTexto.value = `Pagamento à vista no valor de R$ ${valorTotal.toFixed(2)}.`;
+      configurarGaleria(
+        'btnGaleria', 'inputGaleria', 'imagensPreview',
+        () => imagensTemporarias,
+        () => renderizarPreview('imagensPreview', imagensTemporarias, (index) => {
+          imagensTemporarias.splice(index, 1);
+          renderizarPreview('imagensPreview', imagensTemporarias, (i) => { imagensTemporarias.splice(i, 1); });
+        })
+      );
+
+      configurarGaleria(
+        'btnEditGaleria', 'editInputGaleria', 'editImagensPreview',
+        () => editImagensTemporarias,
+        () => renderizarPreview('editImagensPreview', editImagensTemporarias, (index) => {
+          editImagensTemporarias.splice(index, 1);
+          renderizarPreview('editImagensPreview', editImagensTemporarias, (i) => { editImagensTemporarias.splice(i, 1); });
+        })
+      );
+
+      function atualizarTagsContainer(containerId, arrayForm) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = arrayForm.map((item, index) => `
+          <div class="natureza-tag">
+            <span>${item.natureza} ${item.artigo ? `(${item.artigo})` : ''}</span>
+            <button type="button" class="btn-remove-tag" data-index="${index}">×</button>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('.btn-remove-tag').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const idx = parseInt(this.getAttribute('data-index'));
+            arrayForm.splice(idx, 1);
+            atualizarTagsContainer(containerId, arrayForm);
+          });
+        });
+      }
+
+      function configurarPesquisaNaturezaMúltipla(searchInputId, dropdownId, tagsContainerId, getArrayRef) {
+        const searchInput = document.getElementById(searchInputId);
+        const dropdown = document.getElementById(dropdownId);
+
+        searchInput.addEventListener('focus', function() {
+          filtrarEExibir(this.value);
+        });
+
+        searchInput.addEventListener('input', function() {
+          filtrarEExibir(this.value);
+        });
+
+        document.addEventListener('click', function(e) {
+          if (!searchInput.parentElement.contains(e.target)) {
+            dropdown.classList.remove('active');
+          }
+        });
+
+        function filtrarEExibir(termo) {
+          const busca = termo ? termo.toLowerCase().trim() : '';
+          if (busca === '') {
+            renderizarDropdown(naturezasComArtigos, '');
+          } else {
+            const filtradas = naturezasComArtigos.filter(n => 
+              (n.natureza && n.natureza.toLowerCase().includes(busca)) || (n.artigo && n.artigo.toLowerCase().includes(busca))
+            );
+            renderizarDropdown(filtradas, busca);
+          }
+        }
+
+        function renderizarDropdown(lista, termoBusca) {
+          if (lista.length === 0) {
+            dropdown.innerHTML = `<div class="natureza-dropdown-item no-results">
+              <span>🔍 Nenhuma acusação na lista. Aperte [Enter] p/ incluir a digitada.</span>
+            </div>`;
+          } else {
+            dropdown.innerHTML = lista.map(item => {
+              let textoNatureza = item.natureza;
+              let textoArtigo = item.artigo;
+              if (termoBusca) {
+                const regex = new RegExp(`(${termoBusca.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                textoNatureza = item.natureza.replace(regex, '<strong style="color:#f0d878;">$1</strong>');
+                textoArtigo = item.artigo.replace(regex, '<strong style="color:#f0d878;">$1</strong>');
+              }
+              return `<div class="natureza-dropdown-item" data-natureza="${item.natureza}" data-artigo="${item.artigo}">
+                <span>${textoNatureza}</span>
+                <span class="artigo">${textoArtigo}</span>
+              </div>`;
+            }).join('');
+          }
+          dropdown.classList.add('active');
+
+          dropdown.querySelectorAll('.natureza-dropdown-item:not(.no-results)').forEach(item => {
+            item.addEventListener('click', function() {
+              const nat = this.getAttribute('data-natureza');
+              const art = this.getAttribute('data-artigo');
+              adicionarTag(nat, art);
+            });
+          });
+        }
+
+        function adicionarTag(natureza, artigo) {
+          let arr = getArrayRef();
+          if (!arr.some(item => item.natureza.toLowerCase() === natureza.toLowerCase())) {
+            arr.push({ natureza, artigo: artigo || '' });
+            atualizarTagsContainer(tagsContainerId, arr);
+          }
+          searchInput.value = '';
+          dropdown.classList.remove('active');
+          searchInput.focus();
+        }
+
+        searchInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const textoDigitado = this.value.trim();
+            if (!textoDigitado) return;
+
+            const encontrada = naturezasComArtigos.find(n => n.natureza.toLowerCase() === textoDigitado.toLowerCase());
+            if (encontrada) {
+              adicionarTag(encontrada.natureza, encontrada.artigo);
             } else {
-                campoTexto.value = `Valor Total: R$ ${valorTotal.toFixed(2)}\nParcelado em ${qtdParcelas}x de R$ ${valorParcela} cada parcela.`;
+              adicionarTag(textoDigitado, '');
             }
+          }
+        });
+      }
+
+      configurarPesquisaNaturezaMúltipla('naturezaSearch', 'naturezaDropdown', 'naturezasTagsContainer', () => naturezasSelecionadasForm);
+      configurarPesquisaNaturezaMúltipla('editNaturezaSearch', 'editNaturezaDropdown', 'editNaturezasTagsContainer', () => editNaturezasSelecionadasForm);
+
+      function renderizarLista() {
+        const ocorrencias = carregar();
+        const container = document.getElementById('listaOcorrencias');
+        if (!ocorrencias.length) {
+          container.innerHTML = '<div class="empty-message">Nenhuma ocorrência registrada ainda.</div>';
+          return;
         }
+        container.innerHTML = ocorrencias.slice().reverse().map(oc => {
+          const temImagens = oc.imagens && oc.imagens.length > 0;
+          const natsArray = Array.isArray(oc.naturezas) ? oc.naturezas : [{ natureza: oc.natureza || 'Não especificada', artigo: oc.artigo || '' }];
 
-        // --- BANCO DE DADOS INDEXEDDB ---
-        let db;
-        const request = indexedDB.open("BancoCobrancasCalculadas", 1);
+          return `
+            <div class="ocorrencia-card" data-id="${oc.id}">
+              <button class="btn-excluir-card" onclick="window.excluirOcorrencia(${oc.id})" title="Excluir registro">🗑</button>
+              <div class="card-header">
+                <span><strong>${oc.numeroBO || 'S/ Nº'}</strong></span>
+                <span style="font-size:0.75rem;">${oc.dataFato ? oc.dataFato.split('-').reverse().join('/') : '--'} • ${oc.horaFato || '--:--'}</span>
+              </div>
+              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; margin: 0.2rem 0;">
+                ${natsArray.map(n => `
+                  <div style="display:inline-flex; gap:0.2rem; align-items:center;">
+                    <span class="badge-natureza">${n.natureza}</span>
+                    ${n.artigo ? `<span class="badge-artigo">${n.artigo}</span>` : ''}
+                  </div>
+                `).join('')}
+                ${temImagens ? `<span class="badge-imagens">📸 ${oc.imagens.length} foto(s)</span>` : ''}
+              </div>
+              <div class="card-details">
+                <span>📍 ${oc.local || 'Local não informado'}</span>
+                <span>👥 ${oc.envolvidos || '0'} envolvido(s)</span>
+              </div>
+              <div style="font-size:0.78rem; color:#a0b8d0; line-height:1.4;">${oc.descricao ? oc.descricao.substring(0, 100) + (oc.descricao.length > 100 ? '...' : '') : 'Sem descrição.'}</div>
+              ${temImagens ? `
+                <div class="imagens-card">
+                  ${oc.imagens.map((img, i) => `
+                    <div class="imagem-card-item" onclick="window.abrirLightbox('${img}')">
+                      <img src="${img}" alt="Foto ${i+1}">
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+              <div class="card-actions">
+                <button class="btn-editar" onclick="window.editarOcorrencia(${oc.id})">✏️ Editar</button>
+                <button class="btn-whatsapp" onclick="window.compartilharWhatsApp(${oc.id})">📱 Compartilhar</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
 
-        request.onupgradeneeded = function(e) {
-            db = e.target.result;
-            db.createObjectStore("cobrancas", { keyPath: "id", autoIncrement: true });
+      window.excluirOcorrencia = function(id) {
+        if (confirm('🗑️ Tem certeza que deseja excluir este registro?\n\nEsta ação não pode ser desfeita.')) {
+          const ocorrencias = carregar();
+          const novasOcorrencias = ocorrencias.filter(oc => oc.id !== id);
+          salvar(novasOcorrencias);
+          renderizarLista();
+          
+          if (novasOcorrencias.length === 0) {
+            document.getElementById('numeroBO').value = `PMGO-${new Date().getFullYear()}-0001`;
+          } else {
+            document.getElementById('numeroBO').value = `PMGO-${new Date().getFullYear()}-${String(novasOcorrencias.length + 1).padStart(4, '0')}`;
+          }
+        }
+      };
+
+      function registrarOcorrencia() {
+        const num = document.getElementById('numeroBO').value.trim();
+        const data = document.getElementById('dataFato').value;
+        const hora = document.getElementById('horaFato').value;
+        const local = document.getElementById('localOcorrencia').value.trim();
+        const envolvidos = document.getElementById('envolvidos').value;
+        const desc = document.getElementById('descricao').value.trim();
+        
+        if (!num) return alert('⚠️ Preencha o Número do BO.');
+        if (!data) return alert('⚠️ Preencha a Data do fato.');
+        if (!local) return alert('⚠️ Preencha o Local da ocorrência.');
+        if (naturezasSelecionadasForm.length === 0) return alert('⚠️ Insira pelo menos uma Natureza/Acusação na ocorrência.');
+        
+        const ocorrencias = carregar();
+        ocorrencias.push({ 
+          id: Date.now(), 
+          numeroBO: num, 
+          dataFato: data, 
+          horaFato: hora || '', 
+          local, 
+          naturezas: [...naturezasSelecionadasForm],
+          envolvidos: envolvidos || '0', 
+          descricao: desc,
+          imagens: [...imagensTemporarias],
+          registradoEm: new Date().toISOString() 
+        });
+        salvar(ocorrencias);
+        renderizarLista();
+        
+        const hoje = new Date();
+        document.getElementById('dataFato').value = hoje.toISOString().split('T')[0];
+        document.getElementById('horaFato').value = `${String(hoje.getHours()).padStart(2,'0')}:${String(hoje.getMinutes()).padStart(2,'0')}`;
+        document.getElementById('localOcorrencia').value = '';
+        document.getElementById('descricao').value = '';
+        
+        naturezasSelecionadasForm = [];
+        document.getElementById('naturezasTagsContainer').innerHTML = '';
+        document.getElementById('naturezaSearch').value = '';
+        
+        document.getElementById('envolvidos').value = '1';
+        imagensTemporarias = [];
+        document.getElementById('imagensPreview').innerHTML = '';
+        document.getElementById('numeroBO').value = `PMGO-${hoje.getFullYear()}-${String(ocorrencias.length + 1).padStart(4, '0')}`;
+        
+        const btn = document.getElementById('btnRegistrar');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✅ OCORRÊNCIA REGISTRADA!';
+        btn.style.background = 'linear-gradient(180deg, #27ae60, #1e8449)';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = '';
+        }, 1600);
+      }
+
+      window.editarOcorrencia = function(id) {
+        const ocorrencias = carregar();
+        const oc = ocorrencias.find(o => o.id === id);
+        if (!oc) return;
+        ocorrenciaEditandoId = id;
+        
+        document.getElementById('editNumeroBO').value = oc.numeroBO;
+        document.getElementById('editData').value = oc.dataFato;
+        document.getElementById('editHora').value = oc.horaFato;
+        document.getElementById('editLocal').value = oc.local;
+        document.getElementById('editEnvolvidos').value = oc.envolvidos;
+        document.getElementById('editDescricao').value = oc.descricao;
+        
+        if (Array.isArray(oc.naturezas)) {
+          editNaturezasSelecionadasForm = [...oc.naturezas];
+        } else {
+          editNaturezasSelecionadasForm = [{ natureza: oc.natureza || 'Não especificada', artigo: oc.artigo || '' }];
+        }
+        atualizarTagsContainer('editNaturezasTagsContainer', editNaturezasSelecionadasForm);
+        document.getElementById('editNaturezaSearch').value = '';
+        
+        editImagensTemporarias = [...(oc.imagens || [])];
+        renderizarPreview('editImagensPreview', editImagensTemporarias, (index) => {
+          editImagensTemporarias.splice(index, 1);
+          renderizarPreview('editImagensPreview', editImagensTemporarias, (i) => { editImagensTemporarias.splice(i, 1); });
+        });
+        
+        document.getElementById('modalEdicao').classList.add('active');
+      };
+
+      function salvarEdicao() {
+        const ocorrencias = carregar();
+        const index = ocorrencias.findIndex(o => o.id === ocorrenciaEditandoId);
+        if (index === -1) return;
+        if (editNaturezasSelecionadasForm.length === 0) return alert('⚠️ A ocorrência precisa ter pelo menos uma acusação.');
+        
+        ocorrencias[index] = {
+          ...ocorrencias[index],
+          numeroBO: document.getElementById('editNumeroBO').value.trim(),
+          dataFato: document.getElementById('editData').value,
+          horaFato: document.getElementById('editHora').value,
+          local: document.getElementById('editLocal').value.trim(),
+          naturezas: [...editNaturezasSelecionadasForm],
+          envolvidos: document.getElementById('editEnvolvidos').value,
+          descricao: document.getElementById('editDescricao').value.trim(),
+          imagens: [...editImagensTemporarias]
         };
+        salvar(ocorrencias);
+        renderizarLista();
+        fecharModal();
+      }
 
-        request.onsuccess = function(e) {
-            db = e.target.result;
-            renderizarNotas();
-        };
+      function fecharModal() {
+        document.getElementById('modalEdicao').classList.remove('active');
+        editImagensTemporarias = [];
+        editNaturezasSelecionadasForm = [];
+        document.getElementById('editImagensPreview').innerHTML = '';
+        document.getElementById('editNaturezasTagsContainer').innerHTML = '';
+        ocorrenciaEditandoId = null;
+      }
 
-        request.onerror = function() {
-            alert("Erro ao abrir o banco de dados no celular.");
-        };
+      window.compartilharWhatsApp = function(id) {
+        const ocorrencias = carregar();
+        const oc = ocorrencias.find(o => o.id === id);
+        if (!oc) return;
+        const dataFormatada = oc.dataFato ? oc.dataFato.split('-').reverse().join('/') : '--';
+        
+        const natsArray = Array.isArray(oc.naturezas) ? oc.naturezas : [{ natureza: oc.natureza || 'Não especificada', artigo: oc.artigo || '' }];
+        const textoNaturezas = natsArray.map(n => `• ${n.natureza} ${n.artigo ? `(${n.artigo})` : ''}`).join('\n');
 
-        let idEdicaoAtual = null;
-
-        // --- SISTEMA DE RECONHECIMENTO DE VOZ ---
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let reconhecimento = null;
-        let escutando = false;
-
-        if (SpeechRecognition) {
-            reconhecimento = new SpeechRecognition();
-            reconhecimento.continuous = true; 
-            reconhecimento.lang = 'pt-BR';
-
-            reconhecimento.onresult = function(event) {
-                const resultadoAtual = event.results[event.results.length - 1][0].transcript.trim();
-                const resultadoMinusculo = resultadoAtual.toLowerCase();
-                const campoTexto = document.getElementById("notaTexto");
-
-                if (resultadoMinusculo === "salvar anotação" || resultadoMinusculo === "salvar nota") {
-                    salvarNota();
-                    pararVoz();
-                    return;
-                }
-                
-                if (resultadoMinusculo === "limpar tudo" || resultadoMinusculo === "apagar tudo") {
-                    limparFormulario();
-                    return;
-                }
-
-                if (campoTexto.value !== "") {
-                    campoTexto.value += " " + resultadoAtual;
-                } else {
-                    campoTexto.value = resultadoAtual;
-                }
-            };
-
-            reconhecimento.onend = function() {
-                if (escutando) reconhecimento.start(); 
-            };
+        let mensagem = `🛡️ *PMGO - REGISTRO DE OCORRÊNCIA*\n\n` +
+          `📋 *Nº BO:* ${oc.numeroBO}\n` +
+          `📅 *Data:* ${dataFormatada}\n` +
+          `⏰ *Hora:* ${oc.horaFato || 'N/I'}\n` +
+          `📍 *Local:* ${oc.local}\n\n` +
+          `⚖️ *NATUREZA(S) / ACUSAÇÃO(ÕES):*\n${textoNaturezas}\n\n` +
+          `👥 *Envolvidos:* ${oc.envolvidos}\n` +
+          `📝 *Descrição:* ${oc.descricao || 'N/A'}\n`;
+        
+        if (oc.imagens && oc.imagens.length > 0) {
+          mensagem += `\n📸 *${oc.imagens.length} foto(s) anexada(s) ao registro*\n`;
         }
+        
+        mensagem += `\n_Registrado via App PMGO - Polícia Militar de Goiás_ 🛡️`;
+        
+        window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, '_blank');
+      };
 
-        function alternarVoz() {
-            if (!SpeechRecognition) { alert("Voz não suportada."); return; }
-            if (!escutando) {
-                reconhecimento.start();
-                escutando = true;
-                document.getElementById("btnVoz").classList.add("escutando");
-                document.getElementById("statusVoz").style.display = "block";
-            } else {
-                pararVoz();
-            }
-        }
-
-        function pararVoz() {
-            if (reconhecimento) {
-                escutando = false;
-                reconhecimento.stop();
-                document.getElementById("btnVoz").classList.remove("escutando");
-                document.getElementById("statusVoz").style.display = "none";
-            }
-        }
-
-        function limparFormulario() {
-            document.getElementById("notaTitulo").value = "";
-            document.getElementById("notaValor").value = "";
-            document.getElementById("notaParcelas").value = "1";
-            document.getElementById("notaTexto").value = "";
-            idEdicaoAtual = null;
-            document.getElementById("btnSalvarPrincipal").innerHTML = "💾 Registrar Cobrança";
-        }
-
-        // --- OPERAÇÕES CRUD ---
-
-        function salvarNota() {
-            const campoTitulo = document.getElementById("notaTitulo");
-            const campoValor = document.getElementById("notaValor");
-            const campoParcelas = document.getElementById("notaParcelas");
-            const campoTexto = document.getElementById("notaTexto");
-            
-            const titulo = campoTitulo.value.trim();
-            const valor = parseFloat(campoValor.value) || 0;
-            const qtdParcelas = parseInt(campoParcelas.value) || 1;
-            const texto = campoTexto.value.trim();
-
-            if (titulo === "" || texto === "") {
-                alert("Preencha o cliente e os dados antes de salvar!");
-                return;
-            }
-
-            const agora = new Date();
-            const dataHoraFormatada = agora.toLocaleDateString('pt-BR') + ' às ' + 
-                                     agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-            const transacao = db.transaction(["cobrancas"], "readwrite");
-            const store = transacao.objectStore("cobrancas");
-
-            if (idEdicaoAtual !== null) {
-                const pedidoObter = store.get(idEdicaoAtual);
-                pedidoObter.onsuccess = function() {
-                    const cobranca = pedidoObter.result;
-                    cobranca.titulo = titulo;
-                    cobranca.valor = valor;
-                    cobranca.texto = texto;
-                    if (!cobranca.valoresCustomizados || cobranca.valoresCustomizados.length !== qtdParcelas) {
-                        const valorCada = (valor / qtdParcelas).toFixed(2);
-                        cobranca.valoresCustomizados = Array(qtdParcelas).fill(valorCada);
-                    }
-                    if (cobranca.historicoParcelas.length !== qtdParcelas) {
-                        cobranca.historicoParcelas = Array(qtdParcelas).fill(false);
-                    }
-                    store.put(cobranca);
-                };
-            } else {
-                const listaParcelas = Array(qtdParcelas).fill(false);
-                const valorCada = (valor / qtdParcelas).toFixed(2);
-                const valoresCustomizados = Array(qtdParcelas).fill(valorCada);
-
-                const novaCobranca = { 
-                    titulo: titulo, 
-                    valor: valor,
-                    texto: texto, 
-                    dataHora: "Registrado: " + dataHoraFormatada,
-                    historicoParcelas: listaParcelas,
-                    valoresCustomizados: valoresCustomizados
-                };
-                store.add(novaCobranca);
-            }
-
-            transacao.oncomplete = function() {
-                limparFormulario();
-                renderizarNotas();
-            };
-        }
-
-        function renderizarNotas() {
-            const container = document.getElementById("notasContainer");
-            container.innerHTML = "";
-
-            const tx = db.transaction("cobrancas", "readonly");
-            const store = tx.objectStore("cobrancas");
-            const cursorRequest = store.openCursor(null, "prev"); 
-
-            let temCobrancas = false;
-
-            cursorRequest.onsuccess = function(e) {
-                const cursor = e.target.result;
-                if (cursor) {
-                    temCobrancas = true;
-                    const cobranca = cursor.value;
-
-                    const totalParcelas = cobranca.historicoParcelas.length;
-                    
-                    if (!cobranca.valoresCustomizados || cobranca.valoresCustomizados.length !== totalParcelas) {
-                        const valorCada = (cobranca.valor / totalParcelas).toFixed(2);
-                        cobranca.valoresCustomizados = Array(totalParcelas).fill(valorCada);
-                    }
-
-                    let pagas = 0;
-                    let totalPago = 0;
-                    let novoValorTotalCalculado = 0;
-
-                    for(let i = 0; i < totalParcelas; i++) {
-                        const vParcela = parseFloat(cobranca.valoresCustomizados[i]) || 0;
-                        novoValorTotalCalculado += vParcela;
-                        if(cobranca.historicoParcelas[i] === true) {
-                            pagas++;
-                            totalPago += vParcela;
-                        }
-                    }
-                    
-                    let saldoDevedor = novoValorTotalCalculado - totalPago;
-                    if (saldoDevedor < 0) saldoDevedor = 0;
-
-                    let classeCard = "";
-                    let badgeHTML = "";
-                    let statusTextoZap = "🔴 Pendente";
-
-                    if (pagas === 0) {
-                        classeCard = "";
-                        badgeHTML = `<span class="badge-status status-pendente">🔴 Pendente</span>`;
-                    } else if (pagas < totalParcelas) {
-                        classeCard = "parcial";
-                        badgeHTML = `<span class="badge-status status-parcial">🟡 Parcial (${pagas}/${totalParcelas})</span>`;
-                        statusTextoZap = `🟡 Parcial (${pagas} de ${totalParcelas} pagas)`;
-                    } else {
-                        classeCard = "pago";
-                        badgeHTML = `<span class="badge-status status-pago">🟢 PAGO</span>`;
-                        statusTextoZap = "🟢 Totalmente Pago";
-                    }
-
-                    let parcelasHTML = "";
-                    for (let i = 0; i < totalParcelas; i++) {
-                        const checado = cobranca.historicoParcelas[i] ? "checked" : "";
-                        const valorExibicao = cobranca.valoresCustomizados[i];
-                        parcelasHTML += `
-                            <div class="parcela-item">
-                                <div class="parcela-esquerda">
-                                    <input type="checkbox" ${checado} onchange="alternarParcela(${cobranca.id}, ${i}, this.checked)">
-                                    <span class="parcela-texto-valor" id="txt-wrap-${cobranca.id}-${i}">
-                                        Parc. ${i + 1} (R$ ${valorExibicao})
-                                    </span>
-                                </div>
-                                <button class="btn-acao-parcela" id="btn-acao-${cobranca.id}-${i}" onclick="editarValorInline(${cobranca.id}, ${i}, '${valorExibicao}')" title="Editar valor">✏️</button>
-                            </div>
-                        `;
-                    }
-
-                    let textoExibicao = cobranca.texto;
-                    if(totalPago > 0 || Math.abs(cobranca.valor - novoValorTotalCalculado) > 0.01) {
-                        textoExibicao += `\n\n[Balancete Atualizado]\n💰 Novo Total: R$ ${novoValorTotalCalculado.toFixed(2)}\n✅ Total Pago: R$ ${totalPago.toFixed(2)}\n📉 Saldo Restante: R$ ${saldoDevedor.toFixed(2)}`;
-                    }
-
-                    const card = document.createElement("div");
-                    card.className = `nota-card ${classeCard}`;
-                    
-                    card.innerHTML = `
-                        <div class="nota-header-card">
-                            <div class="nota-titulo-exibicao">${escapeHTML(cobranca.titulo)}</div>
-                            ${badgeHTML}
-                        </div>
-                        <div class="nota-texto">${escapeHTML(textoExibicao)}</div>
-                        
-                        <div class="parcelas-container">
-                            ${parcelasHTML}
-                        </div>
-
-                        <div class="nota-footer">
-                            <span>📅 ${cobranca.dataHora}</span>
-                            <div class="botoes-card">
-                                <button class="btn-card btn-zap" onclick="compartilharWhatsApp(\`${escapeJS(cobranca.titulo)}\`, \`${escapeJS(textoExibicao)}\`, '${statusTextoZap}')">🟢 Zap</button>
-                                <button class="btn-card btn-editar" onclick="prepararEdicao(${cobranca.id}, \`${escapeJS(cobranca.titulo)}\`, ${cobranca.valor}, ${totalParcelas}, \`${escapeJS(cobranca.texto)}\`)">Editar</button>
-                                <button class="btn-card btn-excluir" onclick="excluirNota(${cobranca.id})">Excluir</button>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                    cursor.continue();
-                } else if (!temCobrancas) {
-                    container.innerHTML = `<p style="text-align: center; color: #7f8c8d;">Nenhuma cobrança registrada.</p>`;
-                }
-            };
-        }
-
-        // --- FUNÇÃO DE EDIÇÃO ALINHADA SEM QUEBRAR O LAYOUT ---
-        function editarValorInline(idCobranca, indiceParcela, valorAtual) {
-            const txtWrap = document.getElementById(`txt-wrap-${idCobranca}-${indiceParcela}`);
-            const btnAcao = document.getElementById(`btn-acao-${idCobranca}-${indiceParcela}`);
-            if(!txtWrap || !btnAcao) return;
-
-            // Troca o ícone do botão para o check de confirmação
-            btnAcao.innerHTML = "✅";
-            btnAcao.title = "Confirmar valor";
-
-            // Transforma o texto em um input fixo
-            txtWrap.innerHTML = `Parc. ${indiceParcela + 1} R$ `;
-            
-            const input = document.createElement("input");
-            input.type = "number";
-            input.step = "0.01";
-            input.className = "input-inline-parcela";
-            input.value = valorAtual;
-            txtWrap.appendChild(input);
-
-            let jaSalvou = false;
-
-            const salvarMudancaInline = () => {
-                if (jaSalvou) return;
-                jaSalvou = true;
-
-                const novoValor = parseFloat(input.value) || 0;
-                
-                const tx = db.transaction(["cobrancas"], "readwrite");
-                const store = tx.objectStore("cobrancas");
-                const pedidoObter = store.get(idCobranca);
-
-                pedidoObter.onsuccess = function() {
-                    const cobranca = pedidoObter.result;
-                    cobranca.valoresCustomizados[indiceParcela] = novoValor.toFixed(2);
-                    
-                    let novaSomaTotal = 0;
-                    cobranca.valoresCustomizados.forEach(v => novaSomaTotal += parseFloat(v) || 0);
-                    cobranca.valor = novaSomaTotal;
-
-                    store.put(cobranca);
-                };
-
-                tx.oncomplete = function() {
-                    renderizarNotas();
-                };
-            };
-
-            // Eventos de gatilho para salvar com segurança
-            btnAcao.onclick = function(e) {
-                e.stopPropagation();
-                salvarMudancaInline();
-            };
-
-            input.onblur = salvarMudancaInline;
-            input.onkeydown = function(e) {
-                if (e.key === 'Enter') {
-                    salvarMudancaInline();
-                }
-            };
-
-            input.focus();
-            input.select();
-        }
-
-        function compartilharWhatsApp(titulo, texto, status) {
-            const mensagemFormatada = `*Cobrança:* ${titulo}\n\n${texto}\n\n*Status Atual:* ${status}`;
-            const urlZap = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagemFormatada)}`;
-            window.open(urlZap, '_blank');
-        }
-
-        function alternarParcela(idCobrança, indiceParcela, valorChecado) {
-            const tx = db.transaction(["cobrancas"], "readwrite");
-            const store = tx.objectStore("cobrancas");
-            const pedidoObter = store.get(idCobrança);
-
-            pedidoObter.onsuccess = function() {
-                const cobranca = pedidoObter.result;
-                cobranca.historicoParcelas[indiceParcela] = valorChecado;
-                store.put(cobranca);
-            };
-
-            tx.oncomplete = function() {
-                renderizarNotas();
-            };
-        }
-
-        function prepararEdicao(id, tituloOriginal, valorOriginal, qtdParcelas, textoOriginal) {
-            idEdicaoAtual = id;
-            document.getElementById("notaTitulo").value = tituloOriginal;
-            document.getElementById("notaValor").value = valorOriginal > 0 ? valorOriginal : "";
-            document.getElementById("notaParcelas").value = qtdParcelas;
-            document.getElementById("notaTexto").value = textoOriginal;
-            document.getElementById("btnSalvarPrincipal").innerHTML = "🔄 Atualizar Dados";
-            document.getElementById("notaTitulo").focus();
-        }
-
-        function excluirNota(id) {
-            if (confirm("Remover essa cobrança permanentemente?")) {
-                const tx = db.transaction(["cobrancas"], "readwrite");
-                tx.objectStore("cobrancas").delete(id);
-                tx.oncomplete = function() {
-                    if(idEdicaoAtual === id) limparFormulario();
-                    renderizarNotas();
-                };
-            }
-        }
-
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
-        }
-
-        function escapeJS(str) {
-            return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
-        }
-    </script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const hoje = new Date();
+        const dataISO = hoje.toISOString().split('T')[0];
+        const horaAtual = `${String(hoje.getHours()).padStart(2,'0')}:${String(hoje.getMinutes()).padStart(2,'0')}`;
+        
+        document.getElementById('dataFato').value = dataISO;
+        document.getElementById('horaFato').value = horaAtual;
+        
+        const ocorrenciasExistentes = carregar();
+        document.getElementById('numeroBO').value = `PMGO-${hoje.getFullYear()}-${String(ocorrenciasExistentes.length + 1).padStart(4, '0')}`;
+        
+        renderizarLista();
+        
+        document.getElementById('btnRegistrar').addEventListener('click', registrarOcorrencia);
+        document.getElementById('btnLimparTudo').addEventListener('click', () => {
+          if (!carregar().length) return alert('📭 Nenhuma ocorrência para remover.');
+          if (confirm('🗑️ Tem certeza que deseja excluir TODAS as ocorrências?\n\nEsta ação não pode ser desfeita.')) { 
+            localStorage.removeItem(STORAGE_KEY); 
+            renderizarLista(); 
+            document.getElementById('numeroBO').value = `PMGO-${new Date().getFullYear()}-0001`; 
+          }
+        });
+        document.getElementById('btnSalvarEdicao').addEventListener('click', salvarEdicao);
+        document.getElementById('btnCancelarEdicao').addEventListener('click', fecharModal);
+        document.getElementById('modalEdicao').addEventListener('click', (e) => { 
+          if (e.target === e.currentTarget) fecharModal(); 
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
