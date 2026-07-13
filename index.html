@@ -1,1537 +1,543 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>PMGO - Registro de Ocorrências</title>
-  
-  <!-- CONFIGURAÇÕES PARA ADICIONAR À TELA INICIAL COM O ÍCONE DO BRASÃO -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="#0a1628">
-  <meta name="apple-mobile-web-app-title" content="PMGO">
-  
-  <!-- Ícone para iPhone / iOS -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='240' fill='%230b3b2f' stroke='%23d4af37' stroke-width='14'/%3E%3Ccircle cx='256' cy='256' r='210' fill='none' stroke='%23d4af37' stroke-width='4'/%3E%3Ctext x='256' y='180' text-anchor='middle' fill='%23d4af37' font-size='48' font-weight='bold' font-family='serif'%3EPOLÍCIA%3C/text%3E%3Ctext x='256' y='240' text-anchor='middle' fill='%23d4af37' font-size='42' font-weight='bold' font-family='serif'%3EMILITAR%3C/text%3E%3Cpath d='M160 280 L256 340 L352 280' fill='none' stroke='%23d4af37' stroke-width='12' stroke-linecap='round'/%3E%3Ctext x='256' y='320' text-anchor='middle' fill='%23ffffff' font-size='30' font-weight='bold' font-family='serif'%3EGOIÁS%3C/text%3E%3Ccircle cx='256' cy='370' r='28' fill='%23d4af37'/%3E%3Ctext x='256' y='380' text-anchor='middle' fill='%230b3b2f' font-size='24' font-weight='bold'%3EPM%3C/text%3E%3Cpath d='M200 410 L256 460 L312 410' fill='none' stroke='%23d4af37' stroke-width='8'/%3E%3C/svg%3E">
-  
-  <!-- Ícone de Favoritos/Android Geral -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='240' fill='%230b3b2f' stroke='%23d4af37' stroke-width='14'/%3E%3Ccircle cx='256' cy='256' r='210' fill='none' stroke='%23d4af37' stroke-width='4'/%3E%3Ctext x='256' y='180' text-anchor='middle' fill='%23d4af37' font-size='48' font-weight='bold' font-family='serif'%3EPOLÍCIA%3C/text%3E%3Ctext x='256' y='240' text-anchor='middle' fill='%23d4af37' font-size='42' font-weight='bold' font-family='serif'%3EMILITAR%3C/text%3E%3Cpath d='M160 280 L256 340 L352 280' fill='none' stroke='%23d4af37' stroke-width='12' stroke-linecap='round'/%3E%3Ctext x='256' y='320' text-anchor='middle' fill='%23ffffff' font-size='30' font-weight='bold' font-family='serif'%3EGOIÁS%3C/text%3E%3Ccircle cx='256' cy='370' r='28' fill='%23d4af37'/%3E%3Ctext x='256' y='380' text-anchor='middle' fill='%230b3b2f' font-size='24' font-weight='bold'%3EPM%3C/text%3E%3Cpath d='M200 410 L256 460 L312 410' fill='none' stroke='%23d4af37' stroke-width='8'/%3E%3C/svg%3E">
-
-  <!-- Manifesto Android WebApp integrado para forçar o ícone corporativo -->
-  <link rel="manifest" href="data:application/json,{%22name%22:%22Registro%20de%20Ocorrências%20PMGO%22,%22short_name%22:%22PMGO%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a1628%22,%22theme_color%22:%22%230a1628%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%3E%3Ccircle%20cx='256'%20cy='256'%20r='240'%20fill='%230b3b2f'%20stroke='%23d4af37'%20stroke-width='14'/%3E%3Ccircle%20cx='256'%20cy='256'%20r='210'%20fill='none'%20stroke='%23d4af37'%20stroke-width='4'/%3E%3Ctext%20x='256'%20y='180'%20text-anchor='middle'%20fill='%23d4af37'%20font-size='48'%20font-weight='bold'%20font-family='serif'%3EPOLÍCIA%3C/text%3E%3Ctext%20x='256'%20y='240'%20text-anchor='middle'%20fill='%23d4af37'%20font-size='42'%20font-weight='bold'%20font-family='serif'%3EMILITAR%3C/text%3E%3Cpath%20d='M160%20280%20L256%20340%20L352%20280'%20fill='none'%20stroke='%23d4af37'%20stroke-width='12'%20stroke-linecap='round'/%3E%3Ctext%20x='256'%20y='320'%20text-anchor='middle'%20fill='%23ffffff'%20font-size='30'%20font-weight='bold'%20font-family='serif'%3EGOIÁS%3C/text%3E%3Ccircle%20cx='256'%20cy='370'%20r='28'%20fill='%23d4af37'/%3E%3Ctext%20x='256'%20y='380'%20text-anchor='middle'%20fill='%230b3b2f'%20font-size='24'%20font-weight='bold'%3EPM%3C/text%3E%3Cpath%20d='M200%20410%20L256%20460%20L312%20410'%20fill='none'%20stroke='%23d4af37'%20stroke-width='8'/%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]}">
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #0a1628;
-      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 1rem;
-      margin: 0;
-      background-image: 
-        radial-gradient(ellipse at 30% 0%, #1a3442 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 100%, #0f2b21 0%, transparent 50%),
-        linear-gradient(180deg, #0a1628 0%, #061220 100%);
-      position: relative;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 350px;
-      height: 350px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='240' fill='none' stroke='%23d4af37' stroke-width='6' opacity='0.08'/%3E%3Ccircle cx='256' cy='256' r='210' fill='none' stroke='%23d4af37' stroke-width='2' opacity='0.06'/%3E%3Ctext x='256' y='170' text-anchor='middle' fill='%23d4af37' font-size='42' font-weight='bold' font-family='serif' opacity='0.08'%3EPOLÍCIA%3C/text%3E%3Ctext x='256' y='225' text-anchor='middle' fill='%23d4af37' font-size='36' font-weight='bold' font-family='serif' opacity='0.08'%3EMILITAR%3C/text%3E%3Cpath d='M160 270 L256 330 L352 270' fill='none' stroke='%23d4af37' stroke-width='8' opacity='0.07'/%3E%3Ctext x='256' y='310' text-anchor='middle' fill='%23ffffff' font-size='28' font-weight='bold' font-family='serif' opacity='0.07'%3EGOIÁS%3C/text%3E%3Ccircle cx='256' cy='365' r='30' fill='none' stroke='%23d4af37' stroke-width='5' opacity='0.07'/%3E%3Ctext x='256' y='376' text-anchor='middle' fill='%23d4af37' font-size='22' font-weight='bold' opacity='0.08'%3EPM%3C/text%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 680px;
-      background: rgba(15, 28, 47, 0.75);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      border-radius: 1.8rem;
-      padding: 1.5rem 1.5rem 1.8rem;
-      box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.8),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06),
-        0 0 40px rgba(212, 175, 55, 0.05);
-      color: #eef5ff;
-      position: relative;
-      z-index: 1;
-    }
-
-    .top-bar {
-      height: 3px;
-      background: linear-gradient(90deg, #d4af37, #f5e6a3, #d4af37);
-      border-radius: 2px;
-      margin-bottom: 1.5rem;
-      opacity: 0.8;
-    }
-
-    .pm-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.8rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding: 0 0.2rem;
-    }
-
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    .brasao-svg-container {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #f8f4e6, #e8dcc8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 
-        0 4px 15px rgba(0,0,0,0.6),
-        0 0 0 2px #d4af37,
-        inset 0 1px 3px rgba(255,255,255,0.5);
-      border: 2px solid #0a1628;
-      padding: 4px;
-    }
-
-    .brasao-svg {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-    }
-
-    .pm-title h2 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      color: #f0e6c5;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      line-height: 1.2;
-    }
-
-    .pm-title .sub {
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #a0b8d0;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-    }
-
-    .clock-wrapper {
-      background: rgba(8, 20, 40, 0.8);
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      border-radius: 2rem;
-      padding: 0.4rem 1.2rem;
-      box-shadow: 
-        0 0 15px rgba(0,160,255,0.15),
-        inset 0 1px 0 rgba(255,255,255,0.05);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      backdrop-filter: blur(10px);
-    }
-
-    .digital-clock {
-      font-family: 'Courier New', 'Fira Code', monospace;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #a0d8ef;
-      background: #020d1a;
-      padding: 0.2rem 0.7rem;
-      border-radius: 1rem;
-      letter-spacing: 2px;
-      text-shadow: 0 0 10px #00a6ff;
-      box-shadow: inset 0 1px 4px #001020;
-    }
-
-    .date-badge {
-      font-size: 0.8rem;
-      color: #bccfe0;
-      font-weight: 500;
-    }
-
-    .form-section {
-      background: rgba(12, 24, 42, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 1.5rem;
-      padding: 1.5rem 1.4rem;
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      margin: 1.2rem 0;
-      box-shadow: 
-        0 8px 20px rgba(0,0,0,0.5),
-        inset 0 1px 0 rgba(255,255,255,0.04);
-    }
-
-    .field-group {
-      margin-bottom: 1.1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    label {
-      font-weight: 600;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #c9b057;
-      margin-left: 0.2rem;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-
-    input, select, textarea {
-      background: rgba(8, 18, 33, 0.9);
-      border: 1px solid rgba(212, 175, 55, 0.25);
-      border-radius: 1rem;
-      padding: 0.85rem 1.1rem;
-      font-size: 0.9rem;
-      color: #eef5ff;
-      outline: none;
-      transition: all 0.25s ease;
-      font-family: inherit;
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
-      width: 100%;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #d4af37;
-      box-shadow: 
-        0 0 14px rgba(212, 175, 55, 0.25),
-        inset 0 1px 4px rgba(0,0,0,0.5);
-      background: rgba(10, 22, 40, 0.95);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 85px;
-    }
-
-    .row-double {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
-    @media (max-width: 500px) {
-      .row-double {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .row-double .field-group {
-      margin-bottom: 0;
-    }
-
-    .natureza-search-container {
-      position: relative;
-    }
-
-    .natureza-search-input {
-      background: rgba(8, 18, 33, 0.9);
-      border: 1px solid rgba(212, 175, 55, 0.25);
-      border-radius: 1rem;
-      padding: 0.85rem 1.1rem;
-      font-size: 0.9rem;
-      color: #eef5ff;
-      outline: none;
-      transition: all 0.25s ease;
-      font-family: inherit;
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
-      width: 100%;
-      cursor: pointer;
-      caret-color: #d4af37;
-    }
-
-    .natureza-search-input:focus {
-      border-color: #d4af37;
-      box-shadow: 
-        0 0 14px rgba(212, 175, 55, 0.25),
-        inset 0 1px 4px rgba(0,0,0,0.5);
-      background: rgba(10, 22, 40, 0.95);
-    }
-
-    .natureza-search-input::placeholder {
-      color: #6a7d95;
-    }
-
-    .natureza-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #0f1f33;
-      border: 1px solid rgba(212, 175, 55, 0.4);
-      border-radius: 0.8rem;
-      max-height: 280px;
-      overflow-y: auto;
-      z-index: 100;
-      display: none;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-      margin-top: 0.3rem;
-    }
-
-    .natureza-dropdown.active {
-      display: block;
-    }
-
-    .natureza-dropdown-item {
-      padding: 0.7rem 1.1rem;
-      cursor: pointer;
-      color: #ccdbe9;
-      font-size: 0.82rem;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      transition: all 0.15s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .natureza-dropdown-item .artigo {
-      font-size: 0.7rem;
-      color: #d4af37;
-      opacity: 0.8;
-      font-weight: 500;
-    }
-
-    .natureza-dropdown-item:hover {
-      background: rgba(212, 175, 55, 0.15);
-      color: #f0d878;
-    }
-
-    .natureza-dropdown-item.selected {
-      background: rgba(212, 175, 55, 0.25);
-      color: #f0d878;
-      font-weight: 600;
-    }
-
-    .natureza-dropdown-item.no-results {
-      color: #6a7d95;
-      font-style: italic;
-      cursor: pointer;
-      justify-content: center;
-    }
-
-    .natureza-dropdown-item.no-results:hover {
-      background: rgba(212, 175, 55, 0.1);
-      color: #d4af37;
-    }
-
-    .natureza-dropdown::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .natureza-dropdown::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-    }
-
-    .natureza-dropdown::-webkit-scrollbar-thumb {
-      background: #d4af37;
-      border-radius: 10px;
-    }
-
-    .naturezas-tags-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.5rem;
-      min-height: 24px;
-    }
-
-    .natureza-tag {
-      background: rgba(212, 175, 55, 0.15);
-      border: 1px solid rgba(212, 175, 55, 0.4);
-      color: #f5e3a9;
-      padding: 0.25rem 0.6rem;
-      border-radius: 0.5rem;
-      font-size: 0.78rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-weight: 500;
-    }
-
-    .natureza-tag .btn-remove-tag {
-      background: none;
-      border: none;
-      color: #e74c3c;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 0.85rem;
-      padding: 0 0.1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .natureza-tag .btn-remove-tag:hover {
-      color: #ff6b6b;
-    }
-
-    .btn-galeria {
-      background: rgba(20, 35, 55, 0.8);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      color: #d4af37;
-      padding: 0.6rem 1rem;
-      border-radius: 1.5rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      backdrop-filter: blur(4px);
-      width: 100%;
-      justify-content: center;
-    }
-
-    .btn-galeria:hover {
-      background: rgba(30, 50, 75, 0.9);
-      border-color: #d4af37;
-      color: #f0d878;
-      box-shadow: 0 0 10px rgba(212,175,55,0.2);
-    }
-
-    .imagens-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-
-    .imagem-item {
-      position: relative;
-      width: 80px;
-      height: 80px;
-      border-radius: 0.8rem;
-      overflow: hidden;
-      border: 2px solid rgba(212, 175, 55, 0.4);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      cursor: pointer;
-    }
-
-    .imagem-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .imagem-item .btn-remover {
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      background: rgba(192, 57, 43, 0.9);
-      color: white;
-      border: none;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      font-size: 0.7rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      line-height: 1;
-    }
-
-    .imagens-card {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      margin-top: 0.3rem;
-    }
-
-    .imagem-card-item {
-      width: 60px;
-      height: 60px;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .imagem-card-item:hover {
-      border-color: #d4af37;
-      transform: scale(1.05);
-    }
-
-    .imagem-card-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .badge-imagens {
-      background: rgba(37, 211, 102, 0.15);
-      padding: 0.15rem 0.7rem;
-      border-radius: 0.8rem;
-      font-size: 0.65rem;
-      color: #25d366;
-      font-weight: 500;
-      align-self: flex-start;
-      border: 1px solid rgba(37, 211, 102, 0.25);
-    }
-
-    .lightbox {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.95);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-      cursor: pointer;
-    }
-
-    .lightbox.active {
-      display: flex;
-    }
-
-    .lightbox img {
-      max-width: 95%;
-      max-height: 90vh;
-      border-radius: 1rem;
-      border: 2px solid #d4af37;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-    }
-
-    .btn-registrar {
-      background: linear-gradient(180deg, #d4af37 0%, #a07818 100%);
-      color: #0a121f;
-      font-weight: 700;
-      font-size: 1.1rem;
-      padding: 0.9rem 1.8rem;
-      border-radius: 2.5rem;
-      width: 100%;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-top: 0.8rem;
-      cursor: pointer;
-      border: 1px solid #f0d878;
-      box-shadow: 
-        0 8px 18px rgba(0,0,0,0.7),
-        0 0 15px rgba(212, 175, 55, 0.3);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      text-shadow: 0 1px 1px rgba(255,255,255,0.3);
-    }
-
-    .btn-registrar:hover {
-      background: linear-gradient(180deg, #e8c545 0%, #b08620 100%);
-      box-shadow: 
-        0 10px 22px rgba(0,0,0,0.8),
-        0 0 22px rgba(212, 175, 55, 0.5);
-      transform: translateY(-1px);
-    }
-
-    .btn-registrar:active {
-      transform: translateY(1px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.7);
-    }
-
-    .ocorrencias-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 1.5rem 0 0.8rem;
-      padding: 0 0.2rem;
-    }
-
-    .ocorrencias-header h3 {
-      color: #e6d9a8;
-      font-weight: 600;
-      font-size: 1.05rem;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .clear-btn {
-      background: rgba(30, 40, 55, 0.6);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      color: #c9ae5b;
-      padding: 0.4rem 1.1rem;
-      border-radius: 2rem;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: 0.2s;
-      font-weight: 500;
-    }
-
-    .clear-btn:hover {
-      background: rgba(50, 40, 25, 0.8);
-      color: #ffdf80;
-      border-color: #d4af37;
-    }
-
-    .lista-container {
-      max-height: 380px;
-      overflow-y: auto;
-      padding-right: 0.3rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-    }
-
-    .lista-container::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    .lista-container::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-    }
-
-    .lista-container::-webkit-scrollbar-thumb {
-      background: #d4af37;
-      border-radius: 10px;
-    }
-
-    .ocorrencia-card {
-      background: rgba(12, 24, 42, 0.7);
-      border-left: 4px solid #d4af37;
-      border-radius: 1rem;
-      padding: 0.9rem 1.1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      font-size: 0.85rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.05);
-      transition: all 0.2s;
-      position: relative;
-    }
-
-    .ocorrencia-card:hover {
-      background: rgba(16, 30, 50, 0.8);
-      border-left-color: #f0d878;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.6);
-    }
-
-    .btn-excluir-card {
-      position: absolute;
-      top: 8px;
-      right: 10px;
-      background: rgba(192, 57, 43, 0.7);
-      color: white;
-      border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      line-height: 1;
-      transition: all 0.2s;
-      z-index: 10;
-    }
-
-    .btn-excluir-card:hover {
-      background: rgba(231, 76, 60, 0.95);
-      transform: scale(1.1);
-      box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      color: #f5e3a9;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      padding-right: 30px;
-    }
-
-    .card-details {
-      color: #bccfe0;
-      font-size: 0.8rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .badge-natureza {
-      background: linear-gradient(135deg, #b4942c, #8b6914);
-      padding: 0.2rem 0.9rem;
-      border-radius: 1rem;
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      color: #ffffff;
-      font-weight: 700;
-      align-self: flex-start;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-
-    .badge-artigo {
-      background: rgba(212, 175, 55, 0.15);
-      padding: 0.15rem 0.7rem;
-      border-radius: 0.8rem;
-      font-size: 0.65rem;
-      color: #d4af37;
-      font-weight: 500;
-      align-self: flex-start;
-      border: 1px solid rgba(212, 175, 55, 0.25);
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.4rem;
-      flex-wrap: wrap;
-    }
-
-    .btn-editar, .btn-whatsapp {
-      background: rgba(20, 35, 55, 0.8);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      color: #d4af37;
-      padding: 0.35rem 0.9rem;
-      border-radius: 1.5rem;
-      font-size: 0.72rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      backdrop-filter: blur(4px);
-    }
-
-    .btn-editar:hover {
-      background: rgba(30, 50, 75, 0.9);
-      border-color: #d4af37;
-      color: #f0d878;
-      box-shadow: 0 0 10px rgba(212,175,55,0.2);
-    }
-
-    .btn-whatsapp {
-      background: rgba(7, 94, 84, 0.7);
-      border-color: #25d366;
-      color: #ffffff;
-    }
-
-    .btn-whatsapp:hover {
-      background: rgba(18, 140, 126, 0.85);
-      border-color: #25d366;
-      box-shadow: 0 0 12px rgba(37, 211, 102, 0.35);
-    }
-
-    .empty-message {
-      text-align: center;
-      color: #6a7d95;
-      padding: 2rem;
-      font-style: italic;
-      font-size: 0.9rem;
-    }
-
-    .footer-note {
-      margin-top: 1.2rem;
-      font-size: 0.68rem;
-      color: #556b82;
-      text-align: center;
-      border-top: 1px solid rgba(212, 175, 55, 0.15);
-      padding-top: 0.9rem;
-      letter-spacing: 0.5px;
-    }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 999;
-      justify-content: center;
-      align-items: center;
-      padding: 1rem;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: linear-gradient(180deg, #0f1f33, #09182a);
-      border: 2px solid rgba(212, 175, 55, 0.4);
-      border-radius: 1.5rem;
-      padding: 1.5rem;
-      width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
-    }
-
-    .modal-content h3 {
-      color: #d4af37;
-      margin-bottom: 1.2rem;
-      font-size: 1.1rem;
-      text-align: center;
-    }
-
-    .modal-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-      margin-top: 1.2rem;
-    }
-
-    .btn-salvar-edicao {
-      background: linear-gradient(180deg, #d4af37, #9e7d1e);
-      color: #0a121f;
-      font-weight: 700;
-      padding: 0.8rem;
-      border-radius: 2rem;
-      border: 1px solid #f0d878;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .btn-cancelar {
-      background: rgba(40, 50, 65, 0.8);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 0.8rem;
-      border-radius: 2rem;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .btn-salvar-edicao:hover {
-      background: linear-gradient(180deg, #e8c545, #b08620);
-    }
-
-    .btn-cancelar:hover {
-      background: rgba(55, 65, 80, 0.9);
-    }
-
-    .info-text {
-      font-size: 0.7rem;
-      color: #d4af37;
-      margin-top: 0.2rem;
-      opacity: 0.7;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Meu Controle Financeiro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.07);
+            --card-blur: blur(16px);
+            --card-border: rgba(255, 255, 255, 0.1);
+            
+            --primary: #06b6d4;
+            --primary-hover: #0891b2;
+            --success: #10b981;
+            --danger: #f43f5e;
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Container 100% Mobile */
+        .app-container {
+            width: 100%;
+            max-width: 100%;
+            min-height: 100vh;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Header do App */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .user-info h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Cards de Resumo */
+        .summary-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            -webkit-backdrop-filter: var(--card-blur);
+            border: 1px solid var(--card-border);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .summary-card.highlight {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .summary-card span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .summary-card .value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .summary-card.highlight .value {
+            color: var(--success);
+        }
+
+        /* Formulário de Cadastro */
+        .form-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--card-blur);
+            border: 1px solid var(--card-border);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            padding: 14px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+        }
+
+        input#bill-name { flex: 1.8; width: 60%; }
+        input#bill-value { flex: 1; width: 40%; }
+
+        .btn-submit {
+            background: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Lista de Contas */
+        .list-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: -8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bills-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bill-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bill-item:active {
+            transform: scale(0.99);
+        }
+
+        .bill-item.selected {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .bill-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .bill-item.selected .custom-checkbox {
+            border-color: var(--success);
+            background: var(--success);
+        }
+
+        .custom-checkbox::after {
+            content: '';
+            width: 6px;
+            height: 10px;
+            border: solid #0f172a;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            display: none;
+            margin-bottom: 2px;
+        }
+
+        .bill-item.selected .custom-checkbox::after {
+            display: block;
+        }
+
+        .bill-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bill-name {
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .bill-item.selected .bill-name {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .bill-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .bill-value {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        /* Botões de Ação */
+        .btn-edit {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-edit:hover {
+            color: var(--primary);
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-delete:hover {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 20px;
+            font-size: 14px;
+            border: 2px dashed var(--card-border);
+            border-radius: 16px;
+        }
+    </style>
 </head>
 <body>
-  <div class="app-container">
-    <div class="top-bar"></div>
 
-    <div class="pm-header">
-      <div class="logo-area">
-        <div class="brasao-svg-container">
-          <svg class="brasao-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="256" cy="256" r="240" fill="#0b3b2f" stroke="#d4af37" stroke-width="14"/>
-            <circle cx="256" cy="256" r="210" fill="none" stroke="#d4af37" stroke-width="4"/>
-            <text x="256" y="180" text-anchor="middle" fill="#d4af37" font-size="48" font-weight="bold" font-family="serif">POLÍCIA</text>
-            <text x="256" y="240" text-anchor="middle" fill="#d4af37" font-size="42" font-weight="bold" font-family="serif">MILITAR</text>
-            <path d="M160 280 L256 340 L352 280" fill="none" stroke="#d4af37" stroke-width="12" stroke-linecap="round"/>
-            <text x="256" y="320" text-anchor="middle" fill="#ffffff" font-size="30" font-weight="bold" font-family="serif">GOIÁS</text>
-            <circle cx="256" cy="370" r="28" fill="#d4af37"/>
-            <text x="256" y="380" text-anchor="middle" fill="#0b3b2f" font-size="24" font-weight="bold">PM</text>
-            <path d="M200 410 L256 460 L312 410" fill="none" stroke="#d4af37" stroke-width="8"/>
-          </svg>
-        </div>
-        <div class="pm-title">
-          <h2>PMGO</h2>
-          <div class="sub">Polícia Militar de Goiás</div>
-        </div>
-      </div>
-      <div class="clock-wrapper">
-        <span id="dataHoje" class="date-badge"></span>
-        <span id="relogioDigital" class="digital-clock">--:--</span>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="field-group">
-        <label>📋 Número da Ocorrência / BO</label>
-        <input type="text" id="numeroBO" placeholder="Ex: PMGO-2026-01542">
-      </div>
-      <div class="row-double">
-        <div class="field-group">
-          <label>📅 Data do fato</label>
-          <input type="date" id="dataFato">
-        </div>
-        <div class="field-group">
-          <label>⏰ Hora aproximada</label>
-          <input type="time" id="horaFato">
-        </div>
-      </div>
-      <div class="field-group">
-        <label>📍 Endereço / Local</label>
-        <input type="text" id="localOcorrencia" placeholder="Av. Goiás, Setor Central, Goiânia - GO">
-      </div>
-      <div class="row-double">
-        <div class="field-group">
-          <label>⚖️ Natureza da Ocorrência (Múltiplas)</label>
-          <div class="natureza-search-container" id="naturezaContainer">
-            <input 
-              type="text" 
-              class="natureza-search-input" 
-              id="naturezaSearch" 
-              placeholder="🔍 Busque ou digite e pressione Enter..."
-              autocomplete="off"
-            >
-            <div class="natureza-dropdown" id="naturezaDropdown"></div>
-          </div>
-          <div class="naturezas-tags-container" id="naturezasTagsContainer"></div>
-          <div class="info-text">💡 Selecione na lista ou digite algo novo e aperte Enter para incluir na lista de acusações.</div>
-        </div>
-        <div class="field-group">
-          <label>👤 Envolvidos (quantidade)</label>
-          <input type="number" id="envolvidos" placeholder="Nº" min="0" value="1">
-        </div>
-      </div>
-      <div class="field-group">
-        <label>📝 Descrição do fato</label>
-        <textarea id="descricao" placeholder="Descreva a ocorrência de forma objetiva e detalhada..."></textarea>
-      </div>
-      
-      <div class="field-group">
-        <label>🖼️ Imagens da Ocorrência</label>
-        <button type="button" class="btn-galeria" id="btnGaleria">
-          📁 Escolher imagens da galeria
-        </button>
-        <input type="file" id="inputGaleria" accept="image/*" multiple style="display:none;">
-        <div class="imagens-preview" id="imagensPreview"></div>
-        <div class="info-text">💡 Toque nas miniaturas para ampliar</div>
-      </div>
-      
-      <button class="btn-registrar" id="btnRegistrar">
-        📌 REGISTRAR OCORRÊNCIA
-      </button>
-    </div>
-
-    <div class="ocorrencias-header">
-      <h3>📂 Últimos Registros</h3>
-      <button class="clear-btn" id="btnLimparTudo">🗑 Limpar todos</button>
-    </div>
-    <div id="listaOcorrencias" class="lista-container">
-      <div class="empty-message">Nenhuma ocorrência registrada ainda.</div>
-    </div>
-    <div class="footer-note">
-      Polícia Militar do Estado de Goiás • Dados armazenados com segurança localmente
-    </div>
-  </div>
-
-  <div class="lightbox" id="lightbox">
-    <img src="" alt="Imagem da ocorrência" id="lightboxImg">
-  </div>
-
-  <div class="modal-overlay" id="modalEdicao">
-    <div class="modal-content">
-      <h3>✏️ Editar Ocorrência</h3>
-      <div class="field-group">
-        <label>Nº BO</label>
-        <input type="text" id="editNumeroBO">
-      </div>
-      <div class="row-double">
-        <div class="field-group">
-          <label>Data</label>
-          <input type="date" id="editData">
-        </div>
-        <div class="field-group">
-          <label>Hora</label>
-          <input type="time" id="editHora">
-        </div>
-      </div>
-      <div class="field-group">
-        <label>Local</label>
-        <input type="text" id="editLocal">
-      </div>
-      <div class="field-group">
-        <label>Naturezas / Acusações</label>
-        <div class="natureza-search-container" id="editNaturezaContainer">
-          <input 
-            type="text" 
-            class="natureza-search-input" 
-            id="editNaturezaSearch" 
-            placeholder="🔍 Adicione mais naturezas..."
-            autocomplete="off"
-          >
-          <div class="natureza-dropdown" id="editNaturezaDropdown"></div>
-        </div>
-        <div class="naturezas-tags-container" id="editNaturezasTagsContainer"></div>
-      </div>
-      <div class="field-group">
-        <label>Envolvidos</label>
-        <input type="number" id="editEnvolvidos" min="0">
-      </div>
-      <div class="field-group">
-        <label>Descrição</label>
-        <textarea id="editDescricao"></textarea>
-      </div>
-      <div class="field-group">
-        <label>🖼️ Imagens</label>
-        <button type="button" class="btn-galeria" id="btnEditGaleria">
-          📁 Escolher imagens da galeria
-        </button>
-        <input type="file" id="editInputGaleria" accept="image/*" multiple style="display:none;">
-        <div class="imagens-preview" id="editImagensPreview"></div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-salvar-edicao" id="btnSalvarEdicao">💾 Salvar</button>
-        <button class="btn-cancelar" id="btnCancelarEdicao">❌ Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    (function() {
-      const STORAGE_KEY = 'pmgo_ocorrencias_app';
-      let ocorrenciaEditandoId = null;
-      let imagensTemporarias = [];
-      let editImagensTemporarias = [];
-      
-      let naturezasSelecionadasForm = [];
-      let editNaturezasSelecionadasForm = [];
-
-      const naturezasComArtigos = [
-        { natureza: 'Acidente de Trânsito com Vítima', artigo: 'Art. 303 CTB' },
-        { natureza: 'Acidente de Trânsito sem Vítima', artigo: 'Art. 304 CTB' },
-        { natureza: 'Ameaça', artigo: 'Art. 147 CP' },
-        { natureza: 'Apoio a Outros Órgãos', artigo: 'Apoio Institucional' },
-        { natureza: 'Apropriação Indébita', artigo: 'Art. 168 CP' },
-        { natureza: 'Associação para o Tráfico', artigo: 'Art. 35 Lei 11.343/06' },
-        { natureza: 'Ato Infracional (Menor Infrator)', artigo: 'Art. 103 ECA' },
-        { natureza: 'Calúnia', artigo: 'Art. 138 CP' },
-        { natureza: 'Comércio Ilegal de Armas', artigo: 'Art. 17 Lei 10.826/03' },
-        { geometry: 'Constrangimento Ilegal', natureza: 'Constrangimento Ilegal', artigo: 'Art. 146 CP' },
-        { natureza: 'Corrupção Ativa', artigo: 'Art. 333 CP' },
-        { natureza: 'Crime Ambiental', artigo: 'Art. 38 Lei 9.605/98' },
-        { natureza: 'Cultivo de Plantas Entorpecentes', artigo: 'Art. 28 Lei 11.343/06' },
-        { natureza: 'Dano ao Patrimônio', artigo: 'Art. 163 CP' },
-        { natureza: 'Dano ao Patrimônio Público', artigo: 'Art. 163, III CP' },
-        { natureza: 'Desacato', artigo: 'Art. 331 CP' },
-        { natureza: 'Desaparecimento de Pessoa', artigo: 'Arts. 83 e 84 ECA' },
-        { natureza: 'Desmatamento', artigo: 'Art. 50 Lei 9.605/98' },
-        { natureza: 'Desobediência', artigo: 'Art. 330 CP' },
-        { natureza: 'Difamação', artigo: 'Art. 139 CP' },
-        { natureza: 'Direção Perigosa', artigo: 'Art. 308 CTB' },
-        { natureza: 'Disparo de Arma de Fogo', artigo: 'Art. 15 Lei 10.826/03' },
-        { natureza: 'Embriaguez ao Volante', artigo: 'Art. 306 CTB' },
-        { natureza: 'Encontro de Pessoa Desaparecida', artigo: 'Localização' },
-        { natureza: 'Estelionato', artigo: 'Art. 171 CP' },
-        { natureza: 'Falsidade Ideológica', artigo: 'Art. 299 CP' },
-        { natureza: 'Feminicídio', artigo: 'Art. 121, VI CP' },
-        { natureza: 'Fuga do Local de Acidente', artigo: 'Art. 305 CTB' },
-        { natureza: 'Furto Qualificado', artigo: 'Art. 155 CP' },
-        { natureza: 'Furto Simples', artigo: 'Art. 155 CP' },
-        { natureza: 'Homicídio Culposo', artigo: 'Art. 121 CP' },
-        { natureza: 'Homicídio Doloso', artigo: 'Art. 121 CP' },
-        { natureza: 'Injúria', artigo: 'Art. 140 CP' },
-        { natureza: 'Invasão de Propriedade', artigo: 'Art. 150 CP' },
-        { natureza: 'Latrocínio (Roubo Seguido de Morte)', artigo: 'Art. 157 CP' },
-        { natureza: 'Lesão Corporal', artigo: 'Art. 129 CP' },
-        { natureza: 'Lesão Corporal Grave', artigo: 'Art. 129 CP' },
-        { natureza: 'Lesão Corporal Seguida de Morte', artigo: 'Art. 129 CP' },
-        { natureza: 'Maus-tratos a Animais', artigo: 'Art. 32 Lei 9.605/98' },
-        { natureza: 'Ocorrência Policial Militar', artigo: 'Regulamento PM' },
-        { natureza: 'Perturbação da Ordem', artigo: 'Art. 42 LCP' },
-        { natureza: 'Perturbação do Sossego', artigo: 'Art. 42 LCP' },
-        { natureza: 'Porte de Drogas para Consumo', artigo: 'Art. 28 Lei 11.343/06' },
-        { natureza: 'Porte Ilegal de Arma de Fogo', artigo: 'Art. 14 Lei 10.826/03' },
-        { natureza: 'Posse de Drogas', artigo: 'Art. 28 Lei 11.343/06' },
-        { natureza: 'Posse Irregular de Arma', artigo: 'Art. 12 Lei 10.826/03' },
-        { natureza: 'Queimada Ilegal', artigo: 'Art. 41 Lei 9.605/98' },
-        { natureza: 'Receptação', artigo: 'Art. 180 CP' },
-        { natureza: 'Resistência', artigo: 'Art. 329 CP' },
-        { natureza: 'Roubo / 157', artigo: 'Art. 157 CP' },
-        { natureza: 'Roubo com Arma de Fogo', artigo: 'Art. 157 CP' },
-        { natureza: 'Sequestro e Cárcere Privado', artigo: 'Art. 148 CP' },
-        { natureza: 'Tentativa de Homicídio', artigo: 'Art. 121 CP' },
-        { natureza: 'Tráfico de Drogas', artigo: 'Art. 33 Lei 11.343/06' },
-        { natureza: 'Vias de Fato', artigo: 'Art. 21 LCP' },
-        { natureza: 'Violência Doméstica (Maria da Penha)', artigo: 'Art. 7 Lei 11.340/06' }
-      ];
-
-      function atualizarRelogio() {
-        const agora = new Date();
-        document.getElementById('relogioDigital').textContent = 
-          `${String(agora.getHours()).padStart(2,'0')}:${String(agora.getMinutes()).padStart(2,'0')}:${String(agora.getSeconds()).padStart(2,'0')}`;
-        document.getElementById('dataHoje').textContent = 
-          agora.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(',', '');
-      }
-      atualizarRelogio();
-      setInterval(atualizarRelogio, 1000);
-
-      const carregar = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } };
-      const salvar = (lista) => localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
-
-      function comprimirImagem(file, maxWidth = 800, qualidade = 0.7) {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-              const canvas = document.createElement('canvas');
-              let width = img.width;
-              let height = img.height;
-              if (width > maxWidth) {
-                height = (height * maxWidth) / width;
-                width = maxWidth;
-              }
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, height);
-              resolve(canvas.toDataURL('image/jpeg', qualidade));
-            };
-            img.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      function renderizarPreview(containerId, imagensArray, removerCallback) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = imagensArray.map((img, index) => `
-          <div class="imagem-item">
-            <img src="${img}" alt="Imagem ${index + 1}" onclick="abrirLightbox('${img}')">
-            <button class="btn-remover" data-index="${index}">×</button>
-          </div>
-        `).join('');
-        
-        container.querySelectorAll('.btn-remover').forEach(btn => {
-          btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const index = parseInt(this.getAttribute('data-index'));
-            removerCallback(index);
-          });
-        });
-      }
-
-      function abrirLightbox(src) {
-        document.getElementById('lightboxImg').src = src;
-        document.getElementById('lightbox').classList.add('active');
-      }
-
-      document.getElementById('lightbox').addEventListener('click', function() {
-        this.classList.remove('active');
-      });
-
-      window.abrirLightbox = abrirLightbox;
-
-      function configurarGaleria(btnGaleriaId, inputId, previewContainerId, getArrayRef, updateCallback) {
-        document.getElementById(btnGaleriaId).addEventListener('click', function() {
-          document.getElementById(inputId).click();
-        });
-        
-        document.getElementById(inputId).addEventListener('change', async function(e) {
-          if (e.target.files.length > 0) {
-            let arr = getArrayRef();
-            for (const file of e.target.files) {
-              const dataUrl = await comprimirImagem(file);
-              arr.push(dataUrl);
-            }
-            updateCallback();
-            this.value = '';
-          }
-        });
-      }
-
-      configurarGaleria(
-        'btnGaleria', 'inputGaleria', 'imagensPreview',
-        () => imagensTemporarias,
-        () => renderizarPreview('imagensPreview', imagensTemporarias, (index) => {
-          imagensTemporarias.splice(index, 1);
-          renderizarPreview('imagensPreview', imagensTemporarias, (i) => { imagensTemporarias.splice(i, 1); });
-        })
-      );
-
-      configurarGaleria(
-        'btnEditGaleria', 'editInputGaleria', 'editImagensPreview',
-        () => editImagensTemporarias,
-        () => renderizarPreview('editImagensPreview', editImagensTemporarias, (index) => {
-          editImagensTemporarias.splice(index, 1);
-          renderizarPreview('editImagensPreview', editImagensTemporarias, (i) => { editImagensTemporarias.splice(i, 1); });
-        })
-      );
-
-      function atualizarTagsContainer(containerId, arrayForm) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = arrayForm.map((item, index) => `
-          <div class="natureza-tag">
-            <span>${item.natureza} ${item.artigo ? `(${item.artigo})` : ''}</span>
-            <button type="button" class="btn-remove-tag" data-index="${index}">×</button>
-          </div>
-        `).join('');
-
-        container.querySelectorAll('.btn-remove-tag').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const idx = parseInt(this.getAttribute('data-index'));
-            arrayForm.splice(idx, 1);
-            atualizarTagsContainer(containerId, arrayForm);
-          });
-        });
-      }
-
-      function configurarPesquisaNaturezaMúltipla(searchInputId, dropdownId, tagsContainerId, getArrayRef) {
-        const searchInput = document.getElementById(searchInputId);
-        const dropdown = document.getElementById(dropdownId);
-
-        searchInput.addEventListener('focus', function() {
-          filtrarEExibir(this.value);
-        });
-
-        searchInput.addEventListener('input', function() {
-          filtrarEExibir(this.value);
-        });
-
-        document.addEventListener('click', function(e) {
-          if (!searchInput.parentElement.contains(e.target)) {
-            dropdown.classList.remove('active');
-          }
-        });
-
-        function filtrarEExibir(termo) {
-          const busca = termo ? termo.toLowerCase().trim() : '';
-          if (busca === '') {
-            renderizarDropdown(naturezasComArtigos, '');
-          } else {
-            const filtradas = naturezasComArtigos.filter(n => 
-              (n.natureza && n.natureza.toLowerCase().includes(busca)) || (n.artigo && n.artigo.toLowerCase().includes(busca))
-            );
-            renderizarDropdown(filtradas, busca);
-          }
-        }
-
-        function renderizarDropdown(lista, termoBusca) {
-          if (lista.length === 0) {
-            dropdown.innerHTML = `<div class="natureza-dropdown-item no-results">
-              <span>🔍 Nenhuma acusação na lista. Aperte [Enter] p/ incluir a digitada.</span>
-            </div>`;
-          } else {
-            dropdown.innerHTML = lista.map(item => {
-              let textoNatureza = item.natureza;
-              let textoArtigo = item.artigo;
-              if (termoBusca) {
-                const regex = new RegExp(`(${termoBusca.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-                textoNatureza = item.natureza.replace(regex, '<strong style="color:#f0d878;">$1</strong>');
-                textoArtigo = item.artigo.replace(regex, '<strong style="color:#f0d878;">$1</strong>');
-              }
-              return `<div class="natureza-dropdown-item" data-natureza="${item.natureza}" data-artigo="${item.artigo}">
-                <span>${textoNatureza}</span>
-                <span class="artigo">${textoArtigo}</span>
-              </div>`;
-            }).join('');
-          }
-          dropdown.classList.add('active');
-
-          dropdown.querySelectorAll('.natureza-dropdown-item:not(.no-results)').forEach(item => {
-            item.addEventListener('click', function() {
-              const nat = this.getAttribute('data-natureza');
-              const art = this.getAttribute('data-artigo');
-              adicionarTag(nat, art);
-            });
-          });
-        }
-
-        function adicionarTag(natureza, artigo) {
-          let arr = getArrayRef();
-          if (!arr.some(item => item.natureza.toLowerCase() === natureza.toLowerCase())) {
-            arr.push({ natureza, artigo: artigo || '' });
-            atualizarTagsContainer(tagsContainerId, arr);
-          }
-          searchInput.value = '';
-          dropdown.classList.remove('active');
-          searchInput.focus();
-        }
-
-        searchInput.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            const textoDigitado = this.value.trim();
-            if (!textoDigitado) return;
-
-            const encontrada = naturezasComArtigos.find(n => n.natureza.toLowerCase() === textoDigitado.toLowerCase());
-            if (encontrada) {
-              adicionarTag(encontrada.natureza, encontrada.artigo);
-            } else {
-              adicionarTag(textoDigitado, '');
-            }
-          }
-        });
-      }
-
-      configurarPesquisaNaturezaMúltipla('naturezaSearch', 'naturezaDropdown', 'naturezasTagsContainer', () => naturezasSelecionadasForm);
-      configurarPesquisaNaturezaMúltipla('editNaturezaSearch', 'editNaturezaDropdown', 'editNaturezasTagsContainer', () => editNaturezasSelecionadasForm);
-
-      function renderizarLista() {
-        const ocorrencias = carregar();
-        const container = document.getElementById('listaOcorrencias');
-        if (!ocorrencias.length) {
-          container.innerHTML = '<div class="empty-message">Nenhuma ocorrência registrada ainda.</div>';
-          return;
-        }
-        container.innerHTML = ocorrencias.slice().reverse().map(oc => {
-          const temImagens = oc.imagens && oc.imagens.length > 0;
-          const natsArray = Array.isArray(oc.naturezas) ? oc.naturezas : [{ natureza: oc.natureza || 'Não especificada', artigo: oc.artigo || '' }];
-
-          return `
-            <div class="ocorrencia-card" data-id="${oc.id}">
-              <button class="btn-excluir-card" onclick="window.excluirOcorrencia(${oc.id})" title="Excluir registro">🗑</button>
-              <div class="card-header">
-                <span><strong>${oc.numeroBO || 'S/ Nº'}</strong></span>
-                <span style="font-size:0.75rem;">${oc.dataFato ? oc.dataFato.split('-').reverse().join('/') : '--'} • ${oc.horaFato || '--:--'}</span>
-              </div>
-              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center; margin: 0.2rem 0;">
-                ${natsArray.map(n => `
-                  <div style="display:inline-flex; gap:0.2rem; align-items:center;">
-                    <span class="badge-natureza">${n.natureza}</span>
-                    ${n.artigo ? `<span class="badge-artigo">${n.artigo}</span>` : ''}
-                  </div>
-                `).join('')}
-                ${temImagens ? `<span class="badge-imagens">📸 ${oc.imagens.length} foto(s)</span>` : ''}
-              </div>
-              <div class="card-details">
-                <span>📍 ${oc.local || 'Local não informado'}</span>
-                <span>👥 ${oc.envolvidos || '0'} envolvido(s)</span>
-              </div>
-              <div style="font-size:0.78rem; color:#a0b8d0; line-height:1.4;">${oc.descricao ? oc.descricao.substring(0, 100) + (oc.descricao.length > 100 ? '...' : '') : 'Sem descrição.'}</div>
-              ${temImagens ? `
-                <div class="imagens-card">
-                  ${oc.imagens.map((img, i) => `
-                    <div class="imagem-card-item" onclick="window.abrirLightbox('${img}')">
-                      <img src="${img}" alt="Foto ${i+1}">
-                    </div>
-                  `).join('')}
+    <div class="app-container">
+        <div class="app-header">
+            <div class="user-profile">
+                <div class="avatar">M</div>
+                <div class="user-info">
+                    <h2>Meu Controle</h2>
+                    <p>Banco de Dados Local ativo</p>
                 </div>
-              ` : ''}
-              <div class="card-actions">
-                <button class="btn-editar" onclick="window.editarOcorrencia(${oc.id})">✏️ Editar</button>
-                <button class="btn-whatsapp" onclick="window.compartilharWhatsApp(${oc.id})">📱 Compartilhar</button>
-              </div>
             </div>
-          `;
-        }).join('');
-      }
+        </div>
 
-      window.excluirOcorrencia = function(id) {
-        if (confirm('🗑️ Tem certeza que deseja excluir este registro?\n\nEsta ação não pode ser desfeita.')) {
-          const ocorrencias = carregar();
-          const novasOcorrencias = ocorrencias.filter(oc => oc.id !== id);
-          salvar(novasOcorrencias);
-          renderizarLista();
-          
-          if (novasOcorrencias.length === 0) {
-            document.getElementById('numeroBO').value = `PMGO-${new Date().getFullYear()}-0001`;
-          } else {
-            document.getElementById('numeroBO').value = `PMGO-${new Date().getFullYear()}-${String(novasOcorrencias.length + 1).padStart(4, '0')}`;
-          }
-        }
-      };
+        <div class="summary-container">
+            <div class="summary-card">
+                <span>Total Cadastrado</span>
+                <div class="value" id="total-geral">R$ 0,00</div>
+            </div>
+            <div class="summary-card highlight">
+                <span>Selecionado (A Pagar)</span>
+                <div class="value" id="total-selecionado">R$ 0,00</div>
+            </div>
+        </div>
 
-      function registrarOcorrencia() {
-        const num = document.getElementById('numeroBO').value.trim();
-        const data = document.getElementById('dataFato').value;
-        const hora = document.getElementById('horaFato').value;
-        const local = document.getElementById('localOcorrencia').value.trim();
-        const envolvidos = document.getElementById('envolvidos').value;
-        const desc = document.getElementById('descricao').value.trim();
-        
-        if (!num) return alert('⚠️ Preencha o Número do BO.');
-        if (!data) return alert('⚠️ Preencha a Data do fato.');
-        if (!local) return alert('⚠️ Preencha o Local da ocorrência.');
-        if (naturezasSelecionadasForm.length === 0) return alert('⚠️ Insira pelo menos uma Natureza/Acusação na ocorrência.');
-        
-        const ocorrencias = carregar();
-        ocorrencias.push({ 
-          id: Date.now(), 
-          numeroBO: num, 
-          dataFato: data, 
-          horaFato: hora || '', 
-          local, 
-          naturezas: [...naturezasSelecionadasForm],
-          envolvidos: envolvidos || '0', 
-          descricao: desc,
-          imagens: [...imagensTemporarias],
-          registradoEm: new Date().toISOString() 
-        });
-        salvar(ocorrencias);
-        renderizarLista();
-        
-        const hoje = new Date();
-        document.getElementById('dataFato').value = hoje.toISOString().split('T')[0];
-        document.getElementById('horaFato').value = `${String(hoje.getHours()).padStart(2,'0')}:${String(hoje.getMinutes()).padStart(2,'0')}`;
-        document.getElementById('localOcorrencia').value = '';
-        document.getElementById('descricao').value = '';
-        
-        naturezasSelecionadasForm = [];
-        document.getElementById('naturezasTagsContainer').innerHTML = '';
-        document.getElementById('naturezaSearch').value = '';
-        
-        document.getElementById('envolvidos').value = '1';
-        imagensTemporarias = [];
-        document.getElementById('imagensPreview').innerHTML = '';
-        document.getElementById('numeroBO').value = `PMGO-${hoje.getFullYear()}-${String(ocorrencias.length + 1).padStart(4, '0')}`;
-        
-        const btn = document.getElementById('btnRegistrar');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ OCORRÊNCIA REGISTRADA!';
-        btn.style.background = 'linear-gradient(180deg, #27ae60, #1e8449)';
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.style.background = '';
-        }, 1600);
-      }
+        <div class="form-card">
+            <input type="hidden" id="bill-id"> <div class="form-row">
+                <input type="text" id="bill-name" placeholder="Nome da conta..." autocomplete="off">
+                <input type="number" id="bill-value" placeholder="R$ Valor" step="0.01" inputmode="decimal">
+            </div>
+            <button class="btn-submit" id="btn-action" onclick="handleSubmit()">+ Adicionar Conta</button>
+        </div>
 
-      window.editarOcorrencia = function(id) {
-        const ocorrencias = carregar();
-        const oc = ocorrencias.find(o => o.id === id);
-        if (!oc) return;
-        ocorrenciaEditandoId = id;
-        
-        document.getElementById('editNumeroBO').value = oc.numeroBO;
-        document.getElementById('editData').value = oc.dataFato;
-        document.getElementById('editHora').value = oc.horaFato;
-        document.getElementById('editLocal').value = oc.local;
-        document.getElementById('editEnvolvidos').value = oc.envolvidos;
-        document.getElementById('editDescricao').value = oc.descricao;
-        
-        if (Array.isArray(oc.naturezas)) {
-          editNaturezasSelecionadasForm = [...oc.naturezas];
-        } else {
-          editNaturezasSelecionadasForm = [{ natureza: oc.natureza || 'Não especificada', artigo: oc.artigo || '' }];
-        }
-        atualizarTagsContainer('editNaturezasTagsContainer', editNaturezasSelecionadasForm);
-        document.getElementById('editNaturezaSearch').value = '';
-        
-        editImagensTemporarias = [...(oc.imagens || [])];
-        renderizarPreview('editImagensPreview', editImagensTemporarias, (index) => {
-          editImagensTemporarias.splice(index, 1);
-          renderizarPreview('editImagensPreview', editImagensTemporarias, (i) => { editImagensTemporarias.splice(i, 1); });
-        });
-        
-        document.getElementById('modalEdicao').classList.add('active');
-      };
+        <div class="list-section-title">Contas do Mês</div>
+        <ul class="bills-list" id="bills-list">
+            </ul>
+    </div>
 
-      function salvarEdicao() {
-        const ocorrencias = carregar();
-        const index = ocorrencias.findIndex(o => o.id === ocorrenciaEditandoId);
-        if (index === -1) return;
-        if (editNaturezasSelecionadasForm.length === 0) return alert('⚠️ A ocorrência precisa ter pelo menos uma acusação.');
-        
-        ocorrencias[index] = {
-          ...ocorrencias[index],
-          numeroBO: document.getElementById('editNumeroBO').value.trim(),
-          dataFato: document.getElementById('editData').value,
-          horaFato: document.getElementById('editHora').value,
-          local: document.getElementById('editLocal').value.trim(),
-          naturezas: [...editNaturezasSelecionadasForm],
-          envolvidos: document.getElementById('editEnvolvidos').value,
-          descricao: document.getElementById('editDescricao').value.trim(),
-          imagens: [...editImagensTemporarias]
+    <script>
+        // CONFIGURAÇÃO DO BANCO DE DADOS (IndexedDB)
+        let db;
+        const request = indexedDB.open("FinanceAppDB", 1);
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            db.createObjectStore("bills", { keyPath: "id", autoIncrement: true });
         };
-        salvar(ocorrencias);
-        renderizarLista();
-        fecharModal();
-      }
 
-      function fecharModal() {
-        document.getElementById('modalEdicao').classList.remove('active');
-        editImagensTemporarias = [];
-        editNaturezasSelecionadasForm = [];
-        document.getElementById('editImagensPreview').innerHTML = '';
-        document.getElementById('editNaturezasTagsContainer').innerHTML = '';
-        ocorrenciaEditandoId = null;
-      }
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            readAllBills(); 
+        };
 
-      window.compartilharWhatsApp = function(id) {
-        const ocorrencias = carregar();
-        const oc = ocorrencias.find(o => o.id === id);
-        if (!oc) return;
-        const dataFormatada = oc.dataFato ? oc.dataFato.split('-').reverse().join('/') : '--';
-        
-        const natsArray = Array.isArray(oc.naturezas) ? oc.naturezas : [{ natureza: oc.natureza || 'Não especificada', artigo: oc.artigo || '' }];
-        const textoNaturezas = natsArray.map(n => `• ${n.natureza} ${n.artigo ? `(${n.artigo})` : ''}`).join('\n');
+        request.onerror = function() {
+            console.error("Erro ao carregar o banco de dados.");
+        };
 
-        let mensagem = `🛡️ *PMGO - REGISTRO DE OCORRÊNCIA*\n\n` +
-          `📋 *Nº BO:* ${oc.numeroBO}\n` +
-          `📅 *Data:* ${dataFormatada}\n` +
-          `⏰ *Hora:* ${oc.horaFato || 'N/I'}\n` +
-          `📍 *Local:* ${oc.local}\n\n` +
-          `⚖️ *NATUREZA(S) / ACUSAÇÃO(ÕES):*\n${textoNaturezas}\n\n` +
-          `👥 *Envolvidos:* ${oc.envolvidos}\n` +
-          `📝 *Descrição:* ${oc.descricao || 'N/A'}\n`;
-        
-        if (oc.imagens && oc.imagens.length > 0) {
-          mensagem += `\n📸 *${oc.imagens.length} foto(s) anexada(s) ao registro*\n`;
+        // FUNÇÃO PARA LER TODAS AS CONTAS DO BANCO
+        function readAllBills() {
+            const transaction = db.transaction(["bills"], "readonly");
+            const objectStore = transaction.objectStore("bills");
+            const requestAll = objectStore.getAll();
+
+            requestAll.onsuccess = function() {
+                renderList(requestAll.result);
+            };
         }
-        
-        mensagem += `\n_Registrado via App PMGO - Polícia Militar de Goiás_ 🛡️`;
-        
-        window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, '_blank');
-      };
 
-      window.addEventListener('DOMContentLoaded', () => {
-        const hoje = new Date();
-        const dataISO = hoje.toISOString().split('T')[0];
-        const horaAtual = `${String(hoje.getHours()).padStart(2,'0')}:${String(hoje.getMinutes()).padStart(2,'0')}`;
-        
-        document.getElementById('dataFato').value = dataISO;
-        document.getElementById('horaFato').value = horaAtual;
-        
-        const ocorrenciasExistentes = carregar();
-        document.getElementById('numeroBO').value = `PMGO-${hoje.getFullYear()}-${String(ocorrenciasExistentes.length + 1).padStart(4, '0')}`;
-        
-        renderizarLista();
-        
-        document.getElementById('btnRegistrar').addEventListener('click', registrarOcorrencia);
-        document.getElementById('btnLimparTudo').addEventListener('click', () => {
-          if (!carregar().length) return alert('📭 Nenhuma ocorrência para remover.');
-          if (confirm('🗑️ Tem certeza que deseja excluir TODAS as ocorrências?\n\nEsta ação não pode ser desfeita.')) { 
-            localStorage.removeItem(STORAGE_KEY); 
-            renderizarLista(); 
-            document.getElementById('numeroBO').value = `PMGO-${new Date().getFullYear()}-0001`; 
-          }
+        // REDERIZAR A LISTA NA TELA
+        function renderList(bills) {
+            const listElement = document.getElementById('bills-list');
+            listElement.innerHTML = '';
+
+            if (bills.length === 0) {
+                listElement.innerHTML = '<div class="empty-state">Nenhuma conta cadastrada.<br>Adicione uma acima!</div>';
+                document.getElementById('total-geral').innerText = 'R$ 0,00';
+                document.getElementById('total-selecionado').innerText = 'R$ 0,00';
+                return;
+            }
+
+            let totalGeral = 0;
+            let totalSelecionado = 0;
+
+            bills.forEach((bill) => {
+                totalGeral += bill.value;
+                if (bill.selected) {
+                    totalSelecionado += bill.value;
+                }
+
+                const li = document.createElement('li');
+                li.className = `bill-item ${bill.selected ? 'selected' : ''}`;
+                li.setAttribute('onclick', `toggleSelect(${bill.id}, ${bill.selected}, event)`);
+
+                li.innerHTML = `
+                    <div class="bill-left">
+                        <div class="custom-checkbox"></div>
+                        <div class="bill-details">
+                            <span class="bill-name">${bill.name}</span>
+                        </div>
+                    </div>
+                    <div class="bill-right">
+                        <span class="bill-value">R$ ${bill.value.toFixed(2).replace('.', ',')}</span>
+                        <button class="btn-edit" onclick="startEdit(${bill.id}, '${bill.name}', ${bill.value}, event)">✏️</button>
+                        <button class="btn-delete" onclick="deleteBill(${bill.id}, event)">&times;</button>
+                    </div>
+                `;
+
+                listElement.appendChild(li);
+            });
+
+            document.getElementById('total-geral').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-selecionado').innerText = `R$ ${totalSelecionado.toFixed(2).replace('.', ',')}`;
+        }
+
+        // CONTROLADOR DE ADIÇÃO OU ATUALIZAÇÃO
+        function handleSubmit() {
+            const idInput = document.getElementById('bill-id').value;
+            const nameInput = document.getElementById('bill-name');
+            const valueInput = document.getElementById('bill-value');
+
+            const name = nameInput.value.trim();
+            const value = parseFloat(valueInput.value);
+
+            if (!name || isNaN(value) || value <= 0) {
+                alert('Insira um nome e um valor válidos!');
+                return;
+            }
+
+            const transaction = db.transaction(["bills"], "readwrite");
+            const objectStore = transaction.objectStore("bills");
+
+            if (idInput) {
+                const id = parseInt(idInput);
+                const getReq = objectStore.get(id);
+                
+                getReq.onsuccess = function() {
+                    const data = getReq.result;
+                    data.name = name;
+                    data.value = value;
+                    objectStore.put(data);
+                };
+            } else {
+                objectStore.add({ name, value, selected: true });
+            }
+
+            transaction.oncomplete = function() {
+                document.getElementById('bill-id').value = '';
+                nameInput.value = '';
+                valueInput.value = '';
+                document.getElementById('btn-action').innerText = '+ Adicionar Conta';
+                document.getElementById('btn-action').style.background = 'var(--primary)';
+                document.activeElement.blur(); 
+                readAllBills();
+            };
+        }
+
+        // SELECIONAR / DESSELECIONAR CONTA
+        function toggleSelect(id, currentStatus, event) {
+            if (event.target.closest('.btn-delete') || event.target.closest('.btn-edit')) return;
+
+            const transaction = db.transaction(["bills"], "readwrite");
+            const objectStore = transaction.objectStore("bills");
+            const requestGet = objectStore.get(id);
+
+            requestGet.onsuccess = function() {
+                const data = requestGet.result;
+                data.selected = !currentStatus;
+                objectStore.put(data);
+            };
+
+            transaction.oncomplete = function() {
+                readAllBills();
+            };
+        }
+
+        // INICIAR MODO EDIÇÃO
+        function startEdit(id, name, value, event) {
+            event.stopPropagation();
+            
+            document.getElementById('bill-id').value = id;
+            document.getElementById('bill-name').value = name;
+            document.getElementById('bill-value').value = value;
+            
+            const btn = document.getElementById('btn-action');
+            btn.innerText = '💾 Salvar Alterações';
+            btn.style.background = 'var(--success)';
+            
+            document.getElementById('bill-name').focus();
+        }
+
+        // DELETAR CONTA
+        function deleteBill(id, event) {
+            event.stopPropagation();
+            const transaction = db.transaction(["bills"], "readwrite");
+            const objectStore = transaction.objectStore("bills");
+            objectStore.delete(id);
+
+            transaction.oncomplete = function() {
+                readAllBills();
+            };
+        }
+
+        // Atalho Enter
+        document.getElementById('bill-value').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                handleSubmit();
+            }
         });
-        document.getElementById('btnSalvarEdicao').addEventListener('click', salvarEdicao);
-        document.getElementById('btnCancelarEdicao').addEventListener('click', fecharModal);
-        document.getElementById('modalEdicao').addEventListener('click', (e) => { 
-          if (e.target === e.currentTarget) fecharModal(); 
-        });
-      });
-    })();
-  </script>
+    </script>
 </body>
 </html>
