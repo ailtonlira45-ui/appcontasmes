@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, initial-scale=1.0, user-scalable=no">
     <title>Meu Controle Financeiro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -163,8 +163,12 @@
             box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
         }
 
-        input#bill-name { flex: 1.8; width: 60%; }
-        input#bill-value { flex: 1; width: 40%; }
+        input#bill-name { flex: 1.5; width: 55%; }
+        input#bill-date { 
+            flex: 1; 
+            width: 45%; 
+            color-scheme: dark;
+        }
 
         .btn-submit {
             background: var(--primary);
@@ -283,9 +287,14 @@
             gap: 14px;
         }
 
-        .bill-value {
-            font-size: 15px;
-            font-weight: 700;
+        .bill-date-display {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .bill-item.selected .bill-date-display {
+            color: var(--text-muted);
         }
 
         /* Botões de Ação */
@@ -339,26 +348,27 @@
                 <div class="avatar">M</div>
                 <div class="user-info">
                     <h2>Meu Controle</h2>
-                    <p>Banco de Dados Local ativo</p>
+                    <p>Renovação mensal ativa</p>
                 </div>
             </div>
         </div>
 
         <div class="summary-container">
             <div class="summary-card">
-                <span>Total Cadastrado</span>
-                <div class="value" id="total-geral">R$ 0,00</div>
+                <span>Total de Contas</span>
+                <div class="value" id="total-geral">0 contas</div>
             </div>
             <div class="summary-card highlight">
-                <span>Selecionado (A Pagar)</span>
-                <div class="value" id="total-selecionado">R$ 0,00</div>
+                <span>Contas Selecionadas</span>
+                <div class="value" id="total-selecionado">0 contas</div>
             </div>
         </div>
 
         <div class="form-card">
-            <input type="hidden" id="bill-id"> <div class="form-row">
+            <input type="hidden" id="bill-id">
+            <div class="form-row">
                 <input type="text" id="bill-name" placeholder="Nome da conta..." autocomplete="off">
-                <input type="number" id="bill-value" placeholder="R$ Valor" step="0.01" inputmode="decimal">
+                <input type="date" id="bill-date">
             </div>
             <button class="btn-submit" id="btn-action" onclick="handleSubmit()">+ Adicionar Conta</button>
         </div>
@@ -369,7 +379,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO BANCO DE DADOS (IndexedDB)
         let db;
         const request = indexedDB.open("FinanceAppDB", 1);
 
@@ -380,14 +389,61 @@
 
         request.onsuccess = function(event) {
             db = event.target.result;
-            readAllBills(); 
+            checkAndRotateDates(); // Faz a verificação de virada de mês logo ao iniciar o app
         };
 
         request.onerror = function() {
             console.error("Erro ao carregar o banco de dados.");
         };
 
-        // FUNÇÃO PARA LER TODAS AS CONTAS DO BANCO
+        // FUNÇÃO QUE ROTACIONA AS DATAS QUE JÁ PASSARAM PARA O PRÓXIMO MÊS
+        function checkAndRotateDates() {
+            const transaction = db.transaction(["bills"], "readwrite");
+            const objectStore = transaction.objectStore("bills");
+            const requestAll = objectStore.getAll();
+
+            requestAll.onsuccess = function() {
+                const bills = requestAll.result;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Zera hora para comparar apenas a data
+
+                let databaseUpdated = false;
+
+                bills.forEach((bill) => {
+                    const billDate = new Date(bill.date + "T00:00:00"); // Força o fuso horário local
+
+                    // Se a data de vencimento da conta já passou de hoje
+                    if (billDate < today) {
+                        const newDate = new Date(billDate);
+                        
+                        // Adiciona 1 mês à data antiga
+                        newDate.setMonth(newDate.getMonth() + 1);
+                        
+                        // Transforma de volta em string no formato YYYY-MM-DD
+                        const year = newDate.getFullYear();
+                        const month = String(newDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(newDate.getDate()).padStart(2, '0');
+                        
+                        bill.date = `${year}-${month}-${day}`;
+                        bill.selected = false; // Desmarca a conta para o novo ciclo mensal
+                        
+                        objectStore.put(bill);
+                        databaseUpdated = true;
+                    }
+                });
+
+                transaction.oncomplete = function() {
+                    readAllBills(); // Carrega a lista atualizada na tela
+                };
+            };
+        }
+
+        function formatDisplayDate(dateStr) {
+            if (!dateStr) return "";
+            const [year, month, day] = dateStr.split("-");
+            return `${day}/${month}/${year}`;
+        }
+
         function readAllBills() {
             const transaction = db.transaction(["bills"], "readonly");
             const objectStore = transaction.objectStore("bills");
@@ -398,25 +454,26 @@
             };
         }
 
-        // REDERIZAR A LISTA NA TELA
         function renderList(bills) {
             const listElement = document.getElementById('bills-list');
             listElement.innerHTML = '';
 
             if (bills.length === 0) {
                 listElement.innerHTML = '<div class="empty-state">Nenhuma conta cadastrada.<br>Adicione uma acima!</div>';
-                document.getElementById('total-geral').innerText = 'R$ 0,00';
-                document.getElementById('total-selecionado').innerText = 'R$ 0,00';
+                document.getElementById('total-geral').innerText = '0 contas';
+                document.getElementById('total-selecionado').innerText = '0 contas';
                 return;
             }
 
-            let totalGeral = 0;
+            let totalGeral = bills.length;
             let totalSelecionado = 0;
 
+            // Ordena as contas por data de vencimento (as mais próximas do topo)
+            bills.sort((a, b) => new Date(a.date) - new Date(b.date));
+
             bills.forEach((bill) => {
-                totalGeral += bill.value;
                 if (bill.selected) {
-                    totalSelecionado += bill.value;
+                    totalSelecionado++;
                 }
 
                 const li = document.createElement('li');
@@ -431,8 +488,8 @@
                         </div>
                     </div>
                     <div class="bill-right">
-                        <span class="bill-value">R$ ${bill.value.toFixed(2).replace('.', ',')}</span>
-                        <button class="btn-edit" onclick="startEdit(${bill.id}, '${bill.name}', ${bill.value}, event)">✏️</button>
+                        <span class="bill-date-display">${formatDisplayDate(bill.date)}</span>
+                        <button class="btn-edit" onclick="startEdit(${bill.id}, '${bill.name}', '${bill.date}', event)">✏️</button>
                         <button class="btn-delete" onclick="deleteBill(${bill.id}, event)">&times;</button>
                     </div>
                 `;
@@ -440,21 +497,20 @@
                 listElement.appendChild(li);
             });
 
-            document.getElementById('total-geral').innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-            document.getElementById('total-selecionado').innerText = `R$ ${totalSelecionado.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-geral').innerText = `${totalGeral} ${totalGeral === 1 ? 'conta' : 'contas'}`;
+            document.getElementById('total-selecionado').innerText = `${totalSelecionado} ${totalSelecionado === 1 ? 'conta' : 'contas'}`;
         }
 
-        // CONTROLADOR DE ADIÇÃO OU ATUALIZAÇÃO
         function handleSubmit() {
             const idInput = document.getElementById('bill-id').value;
             const nameInput = document.getElementById('bill-name');
-            const valueInput = document.getElementById('bill-value');
+            const dateInput = document.getElementById('bill-date');
 
             const name = nameInput.value.trim();
-            const value = parseFloat(valueInput.value);
+            const date = dateInput.value;
 
-            if (!name || isNaN(value) || value <= 0) {
-                alert('Insira um nome e um valor válidos!');
+            if (!name || !date) {
+                alert('Insira o nome da conta e selecione uma data!');
                 return;
             }
 
@@ -468,25 +524,24 @@
                 getReq.onsuccess = function() {
                     const data = getReq.result;
                     data.name = name;
-                    data.value = value;
+                    data.date = date;
                     objectStore.put(data);
                 };
             } else {
-                objectStore.add({ name, value, selected: true });
+                objectStore.add({ name, date, selected: true });
             }
 
             transaction.oncomplete = function() {
                 document.getElementById('bill-id').value = '';
                 nameInput.value = '';
-                valueInput.value = '';
+                dateInput.value = '';
                 document.getElementById('btn-action').innerText = '+ Adicionar Conta';
                 document.getElementById('btn-action').style.background = 'var(--primary)';
                 document.activeElement.blur(); 
-                readAllBills();
+                checkAndRotateDates(); // Reavalia as datas após adicionar ou editar
             };
         }
 
-        // SELECIONAR / DESSELECIONAR CONTA
         function toggleSelect(id, currentStatus, event) {
             if (event.target.closest('.btn-delete') || event.target.closest('.btn-edit')) return;
 
@@ -505,13 +560,12 @@
             };
         }
 
-        // INICIAR MODO EDIÇÃO
-        function startEdit(id, name, value, event) {
+        function startEdit(id, name, date, event) {
             event.stopPropagation();
             
             document.getElementById('bill-id').value = id;
             document.getElementById('bill-name').value = name;
-            document.getElementById('bill-value').value = value;
+            document.getElementById('bill-date').value = date;
             
             const btn = document.getElementById('btn-action');
             btn.innerText = '💾 Salvar Alterações';
@@ -520,7 +574,6 @@
             document.getElementById('bill-name').focus();
         }
 
-        // DELETAR CONTA
         function deleteBill(id, event) {
             event.stopPropagation();
             const transaction = db.transaction(["bills"], "readwrite");
@@ -532,8 +585,7 @@
             };
         }
 
-        // Atalho Enter
-        document.getElementById('bill-value').addEventListener('keypress', function(event) {
+        document.getElementById('bill-date').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 handleSubmit();
             }
