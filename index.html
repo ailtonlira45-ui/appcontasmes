@@ -714,36 +714,54 @@
 
             requestAll.onsuccess = function() {
                 const bills = requestAll.result;
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
                 
-                let billsRotated = 0;
-
-                bills.forEach((bill) => {
-                    const billDate = new Date(bill.date + "T00:00:00");
-
-                    if (billDate < today) {
-                        const newDate = new Date(billDate);
-                        newDate.setMonth(newDate.getMonth() + 1);
-                        
-                        const year = newDate.getFullYear();
-                        const month = String(newDate.getMonth() + 1).padStart(2, '0');
-                        const day = String(newDate.getDate()).padStart(2, '0');
-                        
-                        bill.date = `${year}-${month}-${day}`;
-                        bill.selected = true; // Marca automaticamente para o novo mês
-                        
-                        objectStore.put(bill);
-                        billsRotated++;
-                    }
-                });
-
-                transaction.oncomplete = function() {
-                    if (billsRotated > 0) {
-                        showToast(`🎉 ${billsRotated} conta(s) renovada(s) automaticamente!`);
-                    }
+                if (bills.length === 0) {
                     readAllBills();
-                };
+                    return;
+                }
+                
+                // Verifica se TODAS as contas estão selecionadas
+                const allSelected = bills.every(bill => bill.selected === true);
+                
+                if (allSelected) {
+                    // Se todas estão selecionadas, renova TODAS para o próximo mês
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    let billsRotated = 0;
+
+                    bills.forEach((bill) => {
+                        const billDate = new Date(bill.date + "T00:00:00");
+                        
+                        // Só renova se a data já passou
+                        if (billDate < today) {
+                            const newDate = new Date(billDate);
+                            newDate.setMonth(newDate.getMonth() + 1);
+                            
+                            const year = newDate.getFullYear();
+                            const month = String(newDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(newDate.getDate()).padStart(2, '0');
+                            
+                            bill.date = `${year}-${month}-${day}`;
+                            bill.selected = false; // Desmarca para o novo ciclo
+                            
+                            objectStore.put(bill);
+                            billsRotated++;
+                        }
+                    });
+
+                    transaction.oncomplete = function() {
+                        if (billsRotated > 0) {
+                            showToast(`🎉 ${billsRotated} conta(s) renovada(s) para o próximo mês!`);
+                        }
+                        readAllBills();
+                    };
+                } else {
+                    // Se nem todas estão selecionadas, apenas carrega a lista
+                    transaction.oncomplete = function() {
+                        readAllBills();
+                    };
+                }
             };
         }
 
@@ -816,6 +834,25 @@
 
             document.getElementById('total-geral').textContent = totalGeral;
             document.getElementById('total-selecionado').textContent = totalSelecionado;
+            
+            // Verifica se todas as contas estão selecionadas e mostra aviso
+            if (totalGeral > 0 && totalSelecionado === totalGeral) {
+                // Todas estão selecionadas, verifica se precisa renovar
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const hasExpiredBills = bills.some(bill => {
+                    const billDate = new Date(bill.date + "T00:00:00");
+                    return billDate < today;
+                });
+                
+                if (hasExpiredBills) {
+                    showToast('✅ Todas as contas marcadas! Renovando para o próximo mês...');
+                    setTimeout(() => {
+                        checkAndRotateDates();
+                    }, 1500);
+                }
+            }
         }
 
         function handleSubmit() {
@@ -891,6 +928,22 @@
 
             transaction.oncomplete = function() {
                 readAllBills();
+                
+                // Após atualizar a lista, verifica se todas estão selecionadas
+                const checkTransaction = db.transaction(["bills"], "readonly");
+                const checkStore = checkTransaction.objectStore("bills");
+                const checkRequest = checkStore.getAll();
+                
+                checkRequest.onsuccess = function() {
+                    const allBills = checkRequest.result;
+                    if (allBills.length > 0 && allBills.every(bill => bill.selected)) {
+                        // Todas as contas estão marcadas
+                        showToast('✅ Todas as contas marcadas! Renovando para o próximo mês...');
+                        setTimeout(() => {
+                            checkAndRotateDates();
+                        }, 1500);
+                    }
+                };
             };
         }
 
