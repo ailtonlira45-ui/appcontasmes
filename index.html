@@ -64,7 +64,6 @@
             overflow-x: hidden;
         }
 
-        /* Background pattern */
         body::before {
             content: '';
             position: fixed;
@@ -92,7 +91,6 @@
             margin: 0 auto;
         }
 
-        /* Header */
         .app-header {
             display: flex;
             flex-direction: column;
@@ -188,7 +186,6 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Cards de Resumo */
         .summary-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -253,7 +250,6 @@
             color: var(--success-light);
         }
 
-        /* Formulário */
         .form-card {
             background: var(--gradient-card);
             border: 1px solid var(--border-color);
@@ -369,7 +365,6 @@
             transform: translateY(0);
         }
 
-        /* Lista */
         .list-section-title {
             font-size: 13px;
             font-weight: 700;
@@ -570,7 +565,6 @@
             display: block;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -595,7 +589,6 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
             .app-container {
                 padding: 16px 12px;
@@ -671,7 +664,8 @@
 
     <script>
         let db;
-        const request = indexedDB.open("FinanceProDB", 1);
+        // USANDO O BANCO DE DADOS ORIGINAL "FinanceAppDB" PARA PRESERVAR SUAS CONTAS
+        const request = indexedDB.open("FinanceAppDB", 1);
 
         request.onupgradeneeded = function(event) {
             db = event.target.result;
@@ -724,7 +718,6 @@
                 today.setHours(0, 0, 0, 0);
                 
                 let billsRotated = 0;
-                let databaseUpdated = false;
 
                 bills.forEach((bill) => {
                     const billDate = new Date(bill.date + "T00:00:00");
@@ -738,10 +731,9 @@
                         const day = String(newDate.getDate()).padStart(2, '0');
                         
                         bill.date = `${year}-${month}-${day}`;
-                        bill.selected = true;
+                        bill.selected = true; // Marca automaticamente para o novo mês
                         
                         objectStore.put(bill);
-                        databaseUpdated = true;
                         billsRotated++;
                     }
                 });
@@ -785,6 +777,7 @@
             let totalGeral = bills.length;
             let totalSelecionado = 0;
 
+            // Ordena por data
             bills.sort((a, b) => new Date(a.date) - new Date(b.date));
 
             bills.forEach((bill) => {
@@ -796,6 +789,7 @@
                 li.className = `bill-item ${bill.selected ? 'selected' : ''}`;
                 li.setAttribute('onclick', `toggleSelect(${bill.id}, ${bill.selected}, event)`);
 
+                // Escapar strings para evitar problemas com aspas
                 const escapedName = bill.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 const escapedDate = bill.date.replace(/'/g, "\\'");
 
@@ -841,6 +835,7 @@
             const objectStore = transaction.objectStore("bills");
 
             if (idInput) {
+                // Modo edição
                 const id = parseInt(idInput);
                 const getReq = objectStore.get(id);
                 
@@ -849,7 +844,7 @@
                     if (data) {
                         data.name = name;
                         data.date = date;
-                        // Preserva o estado de seleção
+                        // Preserva o estado de seleção existente
                         objectStore.put(data);
                     }
                 };
@@ -858,6 +853,7 @@
                     console.error("Erro ao buscar registro para edição");
                 };
             } else {
+                // Novo cadastro
                 objectStore.add({ name, date, selected: true });
             }
 
